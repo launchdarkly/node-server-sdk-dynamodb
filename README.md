@@ -13,15 +13,15 @@ Quick setup
 
 This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
-0. Install this package with `npm`
+1. Install this package with `npm`
 
         npm install ldclient-node-dynamodb-store --save
 
-1. Require the package:
+2. Require the package:
 
         var DynamoDBFeatureStore = require('ldclient-node-dynamodb-store');
 
-2. When configuring your SDK client, add the DynamoDB feature store:
+3. When configuring your SDK client, add the DynamoDB feature store:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME');
         var config = { featureStore: store };
@@ -38,7 +38,7 @@ Alternatively, if you already have a fully configured DynamoDB client object, yo
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { dynamoDBClient: myDynamoDBClientInstance });
 
-3. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
+4. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
 
         var config = { featureStore: store, useLdd: true };
         var client = LaunchDarkly.init('YOUR SDK KEY', config);
