@@ -5,9 +5,14 @@ var winston = require('winston');
 var CachingStoreWrapper = require('ldclient-node/caching_store_wrapper');
 
 var initializedToken = { namespace: '$inited', key: '$inited' };
+var defaultCacheTTLSeconds = 15;
 
 function DynamoDBFeatureStore(tableName, options) {
-  return new CachingStoreWrapper(new dynamoDBFeatureStoreInternal(tableName, options));
+  var ttl = options && options.cacheTTL;
+  if (ttl === null || ttl === undefined) {
+    ttl = defaultCacheTTLSeconds;
+  }
+  return new CachingStoreWrapper(new dynamoDBFeatureStoreInternal(tableName, options), ttl);
 }
 
 function dynamoDBFeatureStoreInternal(tableName, options) {

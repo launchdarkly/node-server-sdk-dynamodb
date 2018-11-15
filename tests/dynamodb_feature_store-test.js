@@ -5,6 +5,7 @@ var AWS = require('aws-sdk');
 describe('DynamoDBFeatureStore', function() {
 
   AWS.config.update({
+    credentials: { accessKeyId: 'fake', secretAccessKey: 'fake' },
     region: 'us-west-2',
     endpoint: 'http://localhost:8000'
   });
@@ -14,30 +15,31 @@ describe('DynamoDBFeatureStore', function() {
   var table='test-store';
 
   beforeAll(function(done) {
-    var params = {
-      TableName: table,
-      KeySchema: [ 
-        { AttributeName: 'namespace', KeyType: 'HASH'},  //Partition key
-        { AttributeName: 'key', KeyType: 'RANGE' }  //Sort key
-      ],
-      AttributeDefinitions: [       
-        { AttributeName: 'namespace', AttributeType: 'S' },
-        { AttributeName: 'key', AttributeType: 'S' }
-      ],
-      ProvisionedThroughput: {       
-        ReadCapacityUnits: 10, 
-        WriteCapacityUnits: 10
+    dynamodb.describeTable({ TableName: table }, function(err) {
+      if (!err) {
+        done();
+        return;
       }
-    };
 
-    dynamodb.deleteTable({ TableName: table }, function(err) {
-      if (err) {
-        jasmine.error('Unable to delete table. Error JSON:', JSON.stringify(err, null, 2));
-      }
+      var params = {
+        TableName: table,
+        KeySchema: [ 
+          { AttributeName: 'namespace', KeyType: 'HASH'},  //Partition key
+          { AttributeName: 'key', KeyType: 'RANGE' }  //Sort key
+        ],
+        AttributeDefinitions: [       
+          { AttributeName: 'namespace', AttributeType: 'S' },
+          { AttributeName: 'key', AttributeType: 'S' }
+        ],
+        ProvisionedThroughput: {       
+          ReadCapacityUnits: 10, 
+          WriteCapacityUnits: 10
+        }
+      };
 
       dynamodb.createTable(params, function(err) {
         if (err) {
-          jasmine.error('Unable to create table. Error JSON:', JSON.stringify(err, null, 2));
+          done.fail('Unable to create table. Error JSON: ' + JSON.stringify(err, null, 2));
         }
         waitForTable(done);
       });
@@ -45,12 +47,12 @@ describe('DynamoDBFeatureStore', function() {
   });
 
   function waitForTable(done) {
-    dynamodb.describeTable({ TableName: table }, function(err) {
+    dynamodb.describeTable({ TableName: table }, function(err, tableInfo) {
       if (err) {
-        if (err.code == 'ResourceNotFoundException') {
+        if (err.code == 'ResourceNotFoundException' || (tableInfo && tableInfo.Table.TableStatus == 'TableStatusActive')) {
           setTimeout(function () { waitForTable(done); }, 100);
         } else {
-          jasmine.error('Unable to create table: ', JSON.stringify(err, null, 2));
+          done.fail('Unable to create table: ' + JSON.stringify(err, null, 2));
         }
       } else {
         done();
@@ -94,7 +96,13 @@ describe('DynamoDBFeatureStore', function() {
     return store;
   }
 
-  testBase.baseFeatureStoreTests(makeStore, clearTable, false);
-  testBase.baseFeatureStoreTests(makeStoreWithoutCache, clearTable, false);
-  testBase.concurrentModificationTests(makeStoreWithoutCache, makeStoreWithHook);
+  describe('cached', function() {
+    testBase.baseFeatureStoreTests(makeStore, clearTable, true);
+  });
+
+  describe('uncached', function() {
+    testBase.baseFeatureStoreTests(makeStoreWithoutCache, clearTable, false);
+  });
+
+  testBase.concurrentModificationTests(makeStore, makeStoreWithHook);
 });
