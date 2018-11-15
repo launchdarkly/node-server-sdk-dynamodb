@@ -6,7 +6,7 @@ This library provides a DynamoDB-backed persistence mechanism (feature store) fo
 
 The minimum version of the LaunchDarkly Node.js SDK for use with this library is 5.6.1.
 
-For more information, see also: [Using a persistent feature store](https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store)
+For more information, see also: [Using a persistent feature store](https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store).
 
 Quick setup
 -----------
