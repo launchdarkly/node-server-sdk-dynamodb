@@ -41,9 +41,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         }
         cb(null);
       } else {
-        // strip namespace as it's just used for partitioning in the table
-        delete data.Item['namespace'];
-        cb(data.Item);
+        cb(unmarshalItem(data.Item));
       }
     });
   };
@@ -58,11 +56,10 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     this.paginationHelper(params, function(params, cb) { return dynamoDBClient.query(params, cb); }).then(function (items) {
       var results = {};
       for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-        // Remove the 'namespace' key from the item as it was only added to be
-        // used as a partition key and is not part of the item itself.
-        delete item['namespace'];
-        results[item.key] = item;
+        var item = unmarshalItem(items[i]);
+        if (item) {
+          results[item.key] = item;
+        }
       }
       cb(results);
     }, function (err) {
@@ -204,14 +201,33 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     });
   };
 
+  function marshalItem(kind, item) {
+    return {
+      namespace: kind.namespace,
+      key: item.key,
+      version: item.version,
+      item: JSON.stringify(item)
+    };
+  }
+
+  function unmarshalItem(dbItem) {
+    var itemJson = dbItem.item;
+    if (itemJson) {
+      try {
+        return JSON.parse(itemJson);
+      } catch(e) {
+        logger.error('database item did not contain a valid JSON object');
+      }
+    }
+    return null;
+  }
+
   function makePutRequest(kind, item) {
-    var storeItem = Object.assign({}, item);
-    storeItem.namespace = kind.namespace;
     return {
       TableName: tableName,
-      Item: storeItem,
+      Item: marshalItem(kind, item),
       ConditionExpression: 'attribute_not_exists(version) OR version < :new_version',
-      ExpressionAttributeValues: {':new_version': storeItem.version }
+      ExpressionAttributeValues: {':new_version': item.version }
     };
   }
 
@@ -223,4 +239,3 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
 }
 
 module.exports = DynamoDBFeatureStore;
-
