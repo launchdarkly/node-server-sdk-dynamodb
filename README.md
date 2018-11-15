@@ -13,7 +13,7 @@ Quick setup
 
 This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
-1. Install this package with `npm`
+1. Install this package with `npm`:
 
         npm install ldclient-node-dynamodb-store --save
 
