@@ -4,7 +4,7 @@ LaunchDarkly SDK for Node.js - DynamoDB integration
 
 This library provides a DynamoDB-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-client), replacing the default in-memory feature store. It uses the AWS SDK for Node.js.
 
-The minimum version of the LaunchDarkly Node.js SDK for use with this library is 5.6.0.
+The minimum version of the LaunchDarkly Node.js SDK for use with this library is 5.6.1.
 
 For more information, see also: [Using a persistent feature store](https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store)
 
