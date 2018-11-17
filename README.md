@@ -43,6 +43,10 @@ Alternatively, if you already have a fully configured DynamoDB client object, yo
         var config = { featureStore: store, useLdd: true };
         var client = LaunchDarkly.init('YOUR SDK KEY', config);
 
+5. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
+
+        var store = DynamoDBFeatureStore('YOUR TABLE NAME', { prefix: 'env1' });
+
 Caching behavior
 ----------------
 

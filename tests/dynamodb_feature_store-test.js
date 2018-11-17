@@ -1,4 +1,5 @@
 var DynamoDBFeatureStore = require('../dynamodb_feature_store');
+var helpers = require('../dynamodb_helpers');
 var testBase = require('ldclient-node/test/feature_store_test_base');
 var AWS = require('aws-sdk');
 
@@ -62,9 +63,8 @@ describe('DynamoDBFeatureStore', function() {
 
   function clearTable(done) {
     var client = new AWS.DynamoDB.DocumentClient();
-    var store = makeStore();
     var ops = [];
-    store.underlyingStore.paginationHelper({TableName: table}, function (params, cb) { client.scan(params, cb); })
+    helpers.paginationHelper({TableName: table}, function (params, cb) { client.scan(params, cb); })
       .then(function (items) {
         for (var i = 0; i < items.length; i++) {
           ops.push({
@@ -77,7 +77,7 @@ describe('DynamoDBFeatureStore', function() {
             }
           });
         }
-        Promise.all(store.underlyingStore.batchWrite(ops))
+        Promise.all(helpers.batchWrite(client, table, ops))
           .then(function() { done(); });
       });
   }

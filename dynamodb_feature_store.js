@@ -2,9 +2,9 @@ var AWS = require('aws-sdk');
 var dataKind = require('ldclient-node/versioned_data_kind');
 var winston = require('winston');
 
+var helpers = require('./dynamodb_helpers');
 var CachingStoreWrapper = require('ldclient-node/caching_store_wrapper');
 
-var initializedToken = { namespace: '$inited', key: '$inited' };
 var defaultCacheTTLSeconds = 15;
 
 function DynamoDBFeatureStore(tableName, options) {
@@ -12,7 +12,7 @@ function DynamoDBFeatureStore(tableName, options) {
   if (ttl === null || ttl === undefined) {
     ttl = defaultCacheTTLSeconds;
   }
-  return new CachingStoreWrapper(new dynamoDBFeatureStoreInternal(tableName, options), ttl);
+  return new CachingStoreWrapper(dynamoDBFeatureStoreInternal(tableName, options), ttl);
 }
 
 function dynamoDBFeatureStoreInternal(tableName, options) {
@@ -26,12 +26,15 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     })
   );
   var dynamoDBClient = options.dynamoDBClient || new AWS.DynamoDB.DocumentClient(options.clientOptions);
+  var prefix = options.prefix || '';
 
-  this.getInternal = function(kind, key, cb) {
+  var store = {};
+
+  store.getInternal = function(kind, key, cb) {
     dynamoDBClient.get({
       TableName: tableName,
       Key: {
-        namespace: kind.namespace,
+        namespace: namespaceForKind(kind),
         key: key,
       }
     }, function(err, data) {
@@ -46,14 +49,9 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     });
   };
 
-  this.getAllInternal = function(kind, cb) {
-    var params = {
-      TableName: tableName,
-      KeyConditionExpression: 'namespace = :namespace',
-      FilterExpression: 'attribute_not_exists(deleted) OR deleted = :deleted',
-      ExpressionAttributeValues: { ':namespace': kind.namespace, ':deleted': false }
-    };
-    this.paginationHelper(params, function(params, cb) { return dynamoDBClient.query(params, cb); }).then(function (items) {
+  store.getAllInternal = function(kind, cb) {
+    var params = queryParamsForNamespace(kind.namespace);
+    helpers.queryHelper(dynamoDBClient, params).then(function (items) {
       var results = {};
       for (var i = 0; i < items.length; i++) {
         var item = unmarshalItem(items[i]);
@@ -68,18 +66,17 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     });
   };
 
-  this.initInternal = function(allData, cb) {
-    var this_ = this;
-    this.paginationHelper({ TableName: tableName }, function(params, cb) { return dynamoDBClient.scan(params, cb); })
+  store.initInternal = function(allData, cb) {
+    readExistingItems(allData)
       .then(function(existingItems) {
-        var existingNamespaceKeys = [];
+        var existingNamespaceKeys = {};
         for (var i = 0; i < existingItems.length; i++) {
           existingNamespaceKeys[makeNamespaceKey(existingItems[i])] = existingItems[i].version;
         }
         
         // Always write the initialized token when we initialize.
-        var ops = [{PutRequest: { TableName: tableName, Item: initializedToken }}];
-        delete existingNamespaceKeys[makeNamespaceKey(initializedToken)];
+        var ops = [{PutRequest: { TableName: tableName, Item: initializedToken() }}];
+        delete existingNamespaceKeys[makeNamespaceKey(initializedToken())];
 
         // Write all initial data (with version checks).
         for (var kindNamespace in allData) {
@@ -104,22 +101,21 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
           }});
         }
 
-        var writePromises = this_.batchWrite(ops);
+        var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
     
-        Promise.all(writePromises).then(function() { cb && cb(); });
+        return Promise.all(writePromises).then(function() { cb && cb(); });
       },
       function (err) {
-        logger.error('failed to retrieve initial state: ' + err);
+        logger.error('failed to initialize: ' + err);
       });
   };
 
-  this.upsertInternal = function(kind, item, cb) {
+  store.upsertInternal = function(kind, item, cb) {
     var params = makePutRequest(kind, item);
 
     // testUpdateHook is instrumentation, used only by the unit tests
-    var prepare = this.testUpdateHook || function(prepareCb) { prepareCb(); };
+    var prepare = store.testUpdateHook || function(prepareCb) { prepareCb(); };
 
-    var this_ = this;
     prepare(function () {
       dynamoDBClient.put(params, function(err) {
         if (err) {
@@ -128,7 +124,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
             cb(err, null);
             return;
           }
-          this_.getInternal(kind, item.key, function (existingItem) {
+          store.getInternal(kind, item.key, function (existingItem) {
             cb(null, existingItem);
           });
           return;
@@ -138,68 +134,60 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     });
   };
 
-  this.initializedInternal = function(cb) {
+  store.initializedInternal = function(cb) {
+    var token = initializedToken();
     dynamoDBClient.get({
       TableName: tableName,
-      Key: initializedToken,
+      Key: token,
     }, function(err, data) {
       if (err) {
         logger.error(err);
         cb(false);
         return;
       }
-      var inited = data.Item && data.Item.key === initializedToken.key;
+      var inited = data.Item && data.Item.key === token.key;
       cb(!!inited);
     });
   };
 
-  this.close = function() {
+  store.close = function() {
     // The node DynamoDB client is stateless, so close isn't a meaningful operation.
   };
 
-  this.batchWrite = function(ops) {
-    var writePromises = [];
-    // BatchWrite can only accept 25 items at a time, so split up the writes into batches of 25.
-    for (var i = 0; i < ops.length; i += 25) {
-      var requestItems = {};
-      requestItems[tableName]= ops.slice(i, i+25);
-      writePromises.push(new Promise(function (resolve, reject) {
-        dynamoDBClient.batchWrite({
-          RequestItems: requestItems
-        }, function(err) {
-          if (err) {
-            logger.error('failed to init: ' + err);
-            reject();
-          }
-          resolve();
+  function queryParamsForNamespace(namespace) {
+    return {
+      TableName: tableName,
+      KeyConditionExpression: 'namespace = :namespace',
+      FilterExpression: 'attribute_not_exists(deleted) OR deleted = :deleted',
+      ExpressionAttributeValues: { ':namespace': namespace, ':deleted': false }
+    };
+  }
+
+  function readExistingItems(newData) {
+    var p = Promise.resolve([]);
+    Object.keys(newData).forEach(function(namespace) {
+      p = p.then(function(previousItems) {
+        var params = queryParamsForNamespace(namespace);
+        return helpers.queryHelper(dynamoDBClient, params).then(function (items) {
+          return previousItems.concat(items);
         });
-      }));
-    }
-    return writePromises;
-  };
-
-  this.paginationHelper = function(params, executeFn, startKey) {
-    var this_ = this;
-    return new Promise(function(resolve, reject) {
-      if (startKey) {
-        params['ExclusiveStartKey'] = startKey;
-      }
-      executeFn(params, function(err, data) {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        if ('LastEvaluatedKey' in data) {
-          this_.paginationHelper(params, executeFn, data['LastEvaluatedKey']).then(function (nextPageItems) {
-            resolve(data.Items.concat(nextPageItems));
-          });
-        } else {
-          resolve(data.Items);
-        }
       });
     });
-  };
+    return p;
+  }
+
+  function prefixedNamespace(baseNamespace) {
+    return prefix ? (prefix + ':' + baseNamespace) : baseNamespace;
+  }
+
+  function namespaceForKind(kind) {
+    return prefixedNamespace(kind.namespace);
+  }
+
+  function initializedToken() {
+    var value = prefixedNamespace('$inited');
+    return { namespace: value, key: value };
+  }
 
   function marshalItem(kind, item) {
     return {
@@ -235,7 +223,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     return item.namespace + '$' + item.key;
   }
 
-  return this;
+  return store;
 }
 
 module.exports = DynamoDBFeatureStore;
