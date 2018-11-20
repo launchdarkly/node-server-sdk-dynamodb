@@ -1,6 +1,6 @@
 {
   "name": "ldclient-node-dynamodb-store",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "DynamoDB-backed feature store for the LaunchDarkly Node.js SDK",
   "main": "dynamodb_feature_store.js",
   "license": "Apache-2.0",
