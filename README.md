@@ -13,37 +13,37 @@ Quick setup
 
 This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
-1. Install this package with `npm`:
+1. In DynamoDB, create a table which has the following schema: a partition key called "namespace" and a sort key called "key", both with a string type. The LaunchDarkly library does not create the table automatically, because it has no way of knowing what additional properties (such as permissions and throughput) you would want it to have.
+
+2. Install this package with `npm`:
 
         npm install ldclient-node-dynamodb-store --save
 
-2. Require the package:
+3. Require the package:
 
         var DynamoDBFeatureStore = require('ldclient-node-dynamodb-store');
 
-3. When configuring your SDK client, add the DynamoDB feature store:
+4. When configuring your SDK client, add the DynamoDB feature store:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME');
         var config = { featureStore: store };
         var client = LaunchDarkly.init('YOUR SDK KEY', config);
 
-The specified table must already exist in DynamoDB. It must have a partition key called "namespace" and a sort key called "key".
-
-By default, the DynamoDB client will try to get your AWS credentials and region name from environment variables and/or local configuration files, as described in the AWS SDK documentation. You can also specify any valid [DynamoDB client options](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property) like this:
+    By default, the DynamoDB client will try to get your AWS credentials and region name from environment variables and/or local configuration files, as described in the AWS SDK documentation. You can also specify any valid [DynamoDB client options](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property) like this:
 
         var dynamoDBOptions = { accessKeyId: 'YOUR KEY', secretAccessKey: 'YOUR SECRET' };
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { clientOptions: dynamoDBOptions });
 
-Alternatively, if you already have a fully configured DynamoDB client object, you can tell LaunchDarkly to use that:
+    Alternatively, if you already have a fully configured DynamoDB client object, you can tell LaunchDarkly to use that:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { dynamoDBClient: myDynamoDBClientInstance });
 
-4. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
+5. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
 
         var config = { featureStore: store, useLdd: true };
         var client = LaunchDarkly.init('YOUR SDK KEY', config);
 
-5. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
+6. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { prefix: 'env1' });
 
@@ -55,7 +55,7 @@ To reduce traffic to DynamoDB, there is an optional in-memory cache that retains
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
 
 About LaunchDarkly
------------
+------------------
 
 * LaunchDarkly is a continuous delivery platform that provides feature flags as a service and allows developers to iterate quickly and safely. We allow you to easily flag your features and manage them from the LaunchDarkly dashboard.  With LaunchDarkly, you can:
     * Roll out a new feature to a subset of your users (like a group of users who opt-in to a beta tester group), gathering feedback and bug reports from real-world use cases.
@@ -69,6 +69,7 @@ About LaunchDarkly
     * [Python](http://docs.launchdarkly.com/docs/python-sdk-reference "LaunchDarkly Python SDK")
     * [Go](http://docs.launchdarkly.com/docs/go-sdk-reference "LaunchDarkly Go SDK")
     * [Node.JS](http://docs.launchdarkly.com/docs/node-sdk-reference "LaunchDarkly Node SDK")
+    * [Electron](http://docs.launchdarkly.com/docs/electron-sdk-reference "LaunchDarkly Electron SDK")
     * [.NET](http://docs.launchdarkly.com/docs/dotnet-sdk-reference "LaunchDarkly .Net SDK")
     * [Ruby](http://docs.launchdarkly.com/docs/ruby-sdk-reference "LaunchDarkly Ruby SDK")
     * [iOS](http://docs.launchdarkly.com/docs/ios-sdk-reference "LaunchDarkly iOS SDK")

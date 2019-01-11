@@ -18,6 +18,7 @@ node-template: &node-template
           JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
     - store_test_results:
         path: reports/junit
+    - run: npm run check-typescript
     - store_artifacts:
         path: reports/junit
 

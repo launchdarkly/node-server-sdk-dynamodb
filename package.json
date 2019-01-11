@@ -5,13 +5,16 @@
   "main": "dynamodb_feature_store.js",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "jest --ci --forceExit"
+    "test": "jest --ci --forceExit",
+    "check-typescript": "node_modules/typescript/bin/tsc"
   },
+  "types": "./index.d.ts",
   "devDependencies": {
     "eslint": "5.8.0",
     "jest": "23.6.0",
     "jest-junit": "5.2.0",
     "ldclient-node": ">= 5.6.1"
+    "typescript": "3.0.1"
   },
   "jest": {
     "rootDir": ".",
