@@ -66,24 +66,25 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     });
   };
 
-  store.initOrderedInternal = function(allData, cb) {
+  store.initInternal = function(allData, cb) {
     readExistingItems(allData)
       .then(function(existingItems) {
         var existingNamespaceKeys = {};
         for (var i = 0; i < existingItems.length; i++) {
           existingNamespaceKeys[makeNamespaceKey(existingItems[i])] = existingItems[i].version;
         }
-        delete existingNamespaceKeys[makeNamespaceKey(initializedToken())];
         
-        // Write all initial data (without version checks).
-        allData.forEach(function(collection) {
-          var kindNamespace = collection.kind.namespace;
-          collection.items.forEach(function(item) {
-            var key = item.key;
+        // Always write the initialized token when we initialize.
+        var ops = [{PutRequest: { TableName: tableName, Item: initializedToken() }}];
+        delete existingNamespaceKeys[makeNamespaceKey(initializedToken())];
+
+        // Write all initial data (with version checks).
+        for (var kindNamespace in allData) {
+          for (var key in allData[kindNamespace]) {
             delete existingNamespaceKeys[kindNamespace + '$' + key];
-            ops.push({ PutRequest: makePutRequest(collection.kind, item) });
-          });
-        });
+            ops.push({ PutRequest: makePutRequest(dataKind[kindNamespace], allData[kindNamespace][key]) });
+          }
+        }
 
         // Remove existing data that is not in the new list.
         for (var namespaceKey in existingNamespaceKeys) {
@@ -99,9 +100,6 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
             ExpressionAttributeValues: {':new_version': version }
           }});
         }
-
-        // Always write the initialized token when we initialize.
-        var ops = [{PutRequest: { TableName: tableName, Item: initializedToken() }}];
 
         var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
     
@@ -153,7 +151,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
   };
 
   store.close = function() {
-    // The Node DynamoDB client is stateless, so close isn't a meaningful operation.
+    // The node DynamoDB client is stateless, so close isn't a meaningful operation.
   };
 
   function queryParamsForNamespace(namespace) {
@@ -165,10 +163,9 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     };
   }
 
-  function readExistingItems(allData) {
+  function readExistingItems(newData) {
     var p = Promise.resolve([]);
-    allData.forEach(function(collection) {
-      var namespace = collection.kind.namespace;
+    Object.keys(newData).forEach(function(namespace) {
       p = p.then(function(previousItems) {
         var params = queryParamsForNamespace(namespace);
         return helpers.queryHelper(dynamoDBClient, params).then(function (items) {
