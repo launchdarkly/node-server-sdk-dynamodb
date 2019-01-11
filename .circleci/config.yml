@@ -12,6 +12,7 @@ node-template: &node-template
     - checkout
     - run: echo "Node version:" `node --version`
     - run: npm install
+    - run: npm run lint
     - run:
         command: npm test
         environment:
