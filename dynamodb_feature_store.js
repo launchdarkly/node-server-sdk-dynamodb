@@ -76,6 +76,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         delete existingNamespaceKeys[makeNamespaceKey(initializedToken())];
         
         // Write all initial data (without version checks).
+        var ops = [];
         allData.forEach(function(collection) {
           var kindNamespace = collection.kind.namespace;
           collection.items.forEach(function(item) {
@@ -101,7 +102,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         }
 
         // Always write the initialized token when we initialize.
-        var ops = [{PutRequest: { TableName: tableName, Item: initializedToken() }}];
+        ops.push({PutRequest: { TableName: tableName, Item: initializedToken() }});
 
         var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
     
