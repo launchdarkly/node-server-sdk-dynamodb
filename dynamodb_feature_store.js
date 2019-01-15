@@ -1,5 +1,4 @@
 var AWS = require('aws-sdk');
-var dataKind = require('ldclient-node/versioned_data_kind');
 var winston = require('winston');
 
 var helpers = require('./dynamodb_helpers');

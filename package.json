@@ -5,16 +5,21 @@
   "main": "dynamodb_feature_store.js",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "jest --ci --forceExit"
+    "test": "jest --ci --forceExit",
+    "check-typescript": "node_modules/typescript/bin/tsc",
+    "lint": "eslint --format 'node_modules/eslint-formatter-pretty' --ignore-path .eslintignore ."
   },
+  "types": "./index.d.ts",
   "devDependencies": {
     "babel-core": "6.26.0",
     "babel-jest": "22.4.3",
     "babel-preset-env": "1.6.1",
     "eslint": "5.8.0",
+    "eslint-formatter-pretty": "1.3.0",
     "jest": "23.6.0",
     "jest-junit": "5.2.0",
-    "ldclient-node": ">= 5.7.0"
+    "ldclient-node": ">= 5.7.0",
+    "typescript": "3.0.1"
   },
   "jest": {
     "rootDir": ".",

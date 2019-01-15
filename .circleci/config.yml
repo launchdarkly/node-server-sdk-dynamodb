@@ -12,12 +12,14 @@ node-template: &node-template
     - checkout
     - run: echo "Node version:" `node --version`
     - run: npm install
+    - run: npm run lint
     - run:
         command: npm test
         environment:
           JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
     - store_test_results:
         path: reports/junit
+    - run: npm run check-typescript
     - store_artifacts:
         path: reports/junit
 
