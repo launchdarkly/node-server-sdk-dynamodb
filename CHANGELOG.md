@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.1.2] - 2019-01-16
+### Fixed:
+- The prefix property added in 1.1.0 did not work correctly: data was written with prefixed keys, but was read with non-prefixed keys. This has been fixed.
+
 ## [1.1.1] - 2019-01-14
 ### Fixed:
 - Fixed a potential race condition that could occur if one process is reading a feature flag while another one is updating the entire data set.

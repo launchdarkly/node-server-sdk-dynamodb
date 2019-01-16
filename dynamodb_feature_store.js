@@ -194,7 +194,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
 
   function marshalItem(kind, item) {
     return {
-      namespace: kind.namespace,
+      namespace: namespaceForKind(kind),
       key: item.key,
       version: item.version,
       item: JSON.stringify(item)
