@@ -90,6 +90,10 @@ describe('DynamoDBFeatureStore', function() {
     return new DynamoDBFeatureStore(table, {cacheTTL: 0});
   }
 
+  function makeStoreWithPrefix(prefix) {
+    return new DynamoDBFeatureStore(table, {prefix: prefix, cacheTTL: 0});
+  }
+
   function makeStoreWithHook(hook) {
     var store = makeStore();
     store.underlyingStore.testUpdateHook = hook;
@@ -101,7 +105,7 @@ describe('DynamoDBFeatureStore', function() {
   });
 
   describe('uncached', function() {
-    testBase.baseFeatureStoreTests(makeStoreWithoutCache, clearTable, false);
+    testBase.baseFeatureStoreTests(makeStoreWithoutCache, clearTable, false, makeStoreWithPrefix);
   });
 
   testBase.concurrentModificationTests(makeStore, makeStoreWithHook);
