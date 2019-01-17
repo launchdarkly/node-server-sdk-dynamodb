@@ -161,7 +161,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
       TableName: tableName,
       KeyConditionExpression: 'namespace = :namespace',
       FilterExpression: 'attribute_not_exists(deleted) OR deleted = :deleted',
-      ExpressionAttributeValues: { ':namespace': namespace, ':deleted': false }
+      ExpressionAttributeValues: { ':namespace': prefixedNamespace(namespace), ':deleted': false }
     };
   }
 
