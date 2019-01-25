@@ -104,6 +104,10 @@ describe('DynamoDBFeatureStore', function() {
     return new DynamoDBFeatureStore(table, {prefix: prefix, cacheTTL: 0});
   }
 
+  function makeStoreWithDefaultPrefix() {
+    return makeStoreWithPrefix('test');
+  }
+
   function makeStoreWithHook(hook) {
     var store = makeStore();
     store.underlyingStore.testUpdateHook = hook;
@@ -116,6 +120,12 @@ describe('DynamoDBFeatureStore', function() {
 
   describe('uncached', function() {
     testBase.baseFeatureStoreTests(makeStoreWithoutCache, clearTable, false, makeStoreWithPrefix);
+  });
+
+  // We run the test suite again here because in the DynamoDB implementation, the prefix is entirely
+  // omitted by default, so we want to make sure all the logic is correct with or without one.
+  describe('uncached with prefix', function() {
+    testBase.baseFeatureStoreTests(makeStoreWithDefaultPrefix, clearTable, false);
   });
 
   testBase.concurrentModificationTests(makeStore, makeStoreWithHook);
