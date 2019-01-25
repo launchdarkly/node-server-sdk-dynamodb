@@ -59,7 +59,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         }
       }
       cb(results);
-    }, function (err) {
+    }).catch(function (err) {
       logger.error('failed to get all ' + kind.namespace +  ': ' + err);
       cb(null);
     });
@@ -70,50 +70,41 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
       .then(function(existingItems) {
         var existingNamespaceKeys = {};
         for (var i = 0; i < existingItems.length; i++) {
-          existingNamespaceKeys[makeNamespaceKey(existingItems[i])] = existingItems[i].version;
+          existingNamespaceKeys[makeNamespaceKey(existingItems[i])] = true;
         }
         delete existingNamespaceKeys[makeNamespaceKey(initializedToken())];
         
         // Write all initial data (without version checks).
         var ops = [];
         allData.forEach(function(collection) {
-          var kindNamespace = collection.kind.namespace;
           collection.items.forEach(function(item) {
             var key = item.key;
-            delete existingNamespaceKeys[kindNamespace + '$' + key];
-            ops.push({ PutRequest: makePutRequest(collection.kind, item) });
+            delete existingNamespaceKeys[namespaceForKind(collection.kind) + '$' + key];
+            ops.push({ PutRequest: { Item: marshalItem(collection.kind, item) } });
           });
         });
 
         // Remove existing data that is not in the new list.
         for (var namespaceKey in existingNamespaceKeys) {
-          var version = existingNamespaceKeys[namespaceKey];
           var namespaceAndKey = namespaceKey.split('$');
-          ops.push({ DeleteRequest: {
-            TableName: tableName,
-            Key: {
-              namespace: namespaceAndKey[0],
-              key: namespaceAndKey[1]
-            },
-            ConditionExpression: 'attribute_not_exists(version) OR version < :new_version',
-            ExpressionAttributeValues: {':new_version': version }
-          }});
+          ops.push({ DeleteRequest: { Key: { namespace: namespaceAndKey[0], key: namespaceAndKey[1] } } });
         }
 
         // Always write the initialized token when we initialize.
-        ops.push({PutRequest: { TableName: tableName, Item: initializedToken() }});
+        ops.push({ PutRequest: { Item: initializedToken() } });
 
         var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
     
-        return Promise.all(writePromises).then(function() { cb && cb(); });
-      },
-      function (err) {
+        return Promise.all(writePromises);
+      })
+      .catch(function (err) {
         logger.error('failed to initialize: ' + err);
-      });
+      })
+      .then(function() { cb && cb(); });
   };
 
   store.upsertInternal = function(kind, item, cb) {
-    var params = makePutRequest(kind, item);
+    var params = makeVersionedPutRequest(kind, item);
 
     // testUpdateHook is instrumentation, used only by the unit tests
     var prepare = store.testUpdateHook || function(prepareCb) { prepareCb(); };
@@ -213,7 +204,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
     return null;
   }
 
-  function makePutRequest(kind, item) {
+  function makeVersionedPutRequest(kind, item) {
     return {
       TableName: tableName,
       Item: marshalItem(kind, item),
