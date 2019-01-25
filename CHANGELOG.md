@@ -2,6 +2,11 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.1.4] - 2019-01-25
+### Fixed:
+- Fixed a bug that could cause a database error when overwriting the entire data set with new data, if there is a key prefix.
+- Fixed a bug that could produce an unhandled promise rejection if there was a database error.
+
 ## [1.1.3] - 2019-01-16
 ### Fixed:
 - The fix in 1.1.2 was incomplete, causing some operations to still fail when there is a prefix.
