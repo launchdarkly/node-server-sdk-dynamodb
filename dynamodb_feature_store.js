@@ -77,10 +77,9 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         // Write all initial data (without version checks).
         var ops = [];
         allData.forEach(function(collection) {
-          var kindNamespace = collection.kind.namespace;
           collection.items.forEach(function(item) {
             var key = item.key;
-            delete existingNamespaceKeys[kindNamespace + '$' + key];
+            delete existingNamespaceKeys[namespaceForKind(collection.kind) + '$' + key];
             ops.push({ PutRequest: makePutRequest(collection.kind, item) });
           });
         });
