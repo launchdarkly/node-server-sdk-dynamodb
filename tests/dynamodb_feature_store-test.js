@@ -133,7 +133,7 @@ describe('DynamoDBFeatureStore', function() {
     });
 
     it('error from query in init', done => {
-      var data = { features: { flag: { key: "flag", version: 1 } } };
+      var data = { features: { flag: { key: 'flag', version: 1 } } };
       client.query = (params, cb) => cb(err);
       store.init(data, function() {
         expect(logger.error).toHaveBeenCalled();
@@ -142,7 +142,7 @@ describe('DynamoDBFeatureStore', function() {
     });
 
     it('error from batchWrite in init', done => {
-      var data = { features: { flag: { key: "flag", version: 1 } } };
+      var data = { features: { flag: { key: 'flag', version: 1 } } };
       client.query = (params, cb) => cb(null, { Items: [] });
       client.batchWrite = (params, cb) => cb(err);
       store.init(data, function() {
