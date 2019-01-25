@@ -59,7 +59,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
         }
       }
       cb(results);
-    }, function (err) {
+    }).catch(function (err) {
       logger.error('failed to get all ' + kind.namespace +  ': ' + err);
       cb(null);
     });
@@ -104,11 +104,12 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
 
         var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
     
-        return Promise.all(writePromises).then(function() { cb && cb(); });
-      },
-      function (err) {
+        return Promise.all(writePromises);
+      })
+      .catch(function (err) {
         logger.error('failed to initialize: ' + err);
-      });
+      })
+      .then(function() { cb && cb(); });
   };
 
   store.upsertInternal = function(kind, item, cb) {

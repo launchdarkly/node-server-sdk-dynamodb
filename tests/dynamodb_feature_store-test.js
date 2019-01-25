@@ -1,7 +1,17 @@
 var DynamoDBFeatureStore = require('../dynamodb_feature_store');
 var helpers = require('../dynamodb_helpers');
 var testBase = require('ldclient-node/test/feature_store_test_base');
+var dataKind = require('ldclient-node/versioned_data_kind');
 var AWS = require('aws-sdk');
+
+function stubLogger() {
+  return {
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn()
+  };
+}
 
 describe('DynamoDBFeatureStore', function() {
 
@@ -13,7 +23,7 @@ describe('DynamoDBFeatureStore', function() {
 
   var dynamodb = new AWS.DynamoDB();
 
-  var table='test-store';
+  var table = 'test-store';
 
   beforeAll(function(done) {
     dynamodb.describeTable({ TableName: table }, function(err) {
@@ -109,4 +119,71 @@ describe('DynamoDBFeatureStore', function() {
   });
 
   testBase.concurrentModificationTests(makeStore, makeStoreWithHook);
+
+  describe('handling errors from DynamoDB client', function() {
+    var err = new Error('error');
+    var client;
+    var logger;
+    var store;
+
+    beforeEach(() => {
+      client = {};
+      logger = stubLogger();
+      store = new DynamoDBFeatureStore(table, { dynamoDBClient: client, logger: logger });
+    });
+
+    it('error from query in init', done => {
+      var data = { features: { flag: { key: "flag", version: 1 } } };
+      client.query = (params, cb) => cb(err);
+      store.init(data, function() {
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('error from batchWrite in init', done => {
+      var data = { features: { flag: { key: "flag", version: 1 } } };
+      client.query = (params, cb) => cb(null, { Items: [] });
+      client.batchWrite = (params, cb) => cb(err);
+      store.init(data, function() {
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('error from get', done => {
+      client.get = (params, cb) => cb(err);
+      store.get(dataKind.features, 'flag', function(result) {
+        expect(result).toBe(null);
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('error from get all', done => {
+      client.query = (params, cb) => cb(err);
+      store.all(dataKind.features, function(result) {
+        expect(result).toBe(null);
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('error from upsert', done => {
+      client.put = (params, cb) => cb(err);
+      store.upsert(dataKind.features, { key: 'flag', version: 1 }, function() {
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('error from initialized', done => {
+      client.get = (params, cb) => cb(err);
+      store.initialized(function(result) {
+        expect(result).toBe(false);
+        expect(logger.error).toHaveBeenCalled();
+        done();
+      });
+    });
+  });
 });
