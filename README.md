@@ -1,6 +1,6 @@
 LaunchDarkly SDK for Node.js - DynamoDB integration
 ===================================================
-[![CircleCI](https://circleci.com/gh/launchdarkly/node-dynamodb-store.svg?style=svg)](https://circleci.com/gh/launchdarkly/node-dynamodb-store)
+[![CircleCI](https://circleci.com/gh/launchdarkly/node-server-sdk-dynamodb.svg?style=svg)](https://circleci.com/gh/launchdarkly/node-server-sdk-dynamodb)
 
 This library provides a DynamoDB-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-client), replacing the default in-memory feature store. It uses the AWS SDK for Node.js.
 
