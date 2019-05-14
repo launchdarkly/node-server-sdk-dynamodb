@@ -52,12 +52,6 @@ To reduce traffic to DynamoDB, there is an optional in-memory cache that retains
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
 
-## Caching behavior
-
-To reduce traffic to Consul, there is an optional in-memory cache that retains the last known data for a configurable amount of time. This is on by default; to turn it off (and guarantee that the latest feature flag data will always be retrieved from Consul for every flag evaluation), configure the store as follows:
-
-        var store = ConsulFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
-
 ## About LaunchDarkly
 
 * LaunchDarkly is a continuous delivery platform that provides feature flags as a service and allows developers to iterate quickly and safely. We allow you to easily flag your features and manage them from the LaunchDarkly dashboard.  With LaunchDarkly, you can:
