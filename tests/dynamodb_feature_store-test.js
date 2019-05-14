@@ -1,7 +1,7 @@
 var DynamoDBFeatureStore = require('../dynamodb_feature_store');
 var helpers = require('../dynamodb_helpers');
-var testBase = require('ldclient-node/test/feature_store_test_base');
-var dataKind = require('ldclient-node/versioned_data_kind');
+var testBase = require('launchdarkly-node-server-sdk/test/feature_store_test_base');
+var dataKind = require('launchdarkly-node-server-sdk/versioned_data_kind');
 var AWS = require('aws-sdk');
 
 function stubLogger() {
