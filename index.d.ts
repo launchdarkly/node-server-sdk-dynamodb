@@ -1,4 +1,4 @@
-// Type definitions for ldclient-node-dynamodb-store
+// Type definitions for launchdarkly-node-server-sdk-dynamodb
 
 /**
  * Interface for the DynamoDB feature store component to be used with the LaunchDarkly SDK.
@@ -6,8 +6,8 @@
  * See: https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store
  */
 
-declare module 'ldclient-node-dynamodb-store' {
-  import { LDFeatureStore, LDLogger } from 'ldclient-node';
+declare module 'launchdarkly-node-server-sdk-dynamodb' {
+  import { LDFeatureStore, LDLogger } from 'launchdarkly-node-server-sdk';
   import { DynamoDB } from 'aws-sdk';
 
   /**

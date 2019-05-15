@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.1.5] - 2019-05-14
+### Changed:
+- Corresponding to the SDK package name change from `ldclient-node` to `launchdarkly-node-server-sdk`, this package is now called `launchdarkly-node-server-sdk-dynamodb`. The functionality of the package, including the namespaces and class names, has not changed.
+
 ## [1.1.4] - 2019-01-25
 ### Fixed:
 - Fixed a bug that could cause a database error when overwriting the entire data set with new data, if there is a key prefix.

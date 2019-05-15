@@ -2,7 +2,7 @@ var AWS = require('aws-sdk');
 var winston = require('winston');
 
 var helpers = require('./dynamodb_helpers');
-var CachingStoreWrapper = require('ldclient-node/caching_store_wrapper');
+var CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 
 var defaultCacheTTLSeconds = 15;
 
