@@ -13,7 +13,7 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
   /**
    * Create a feature flag store backed by DynamoDB.
    */
-  export function DynamoDBFeatureStore(
+  export default function DynamoDBFeatureStore(
     /**
      * The table name in DynamoDB. This table must already exist (see readme).
      */
