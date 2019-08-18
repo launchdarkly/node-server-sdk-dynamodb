@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.1.7] - 2019-08-18
+### Added:
+- Generated HTML documentation.
+
 ## [1.1.6] - 2019-08-16
 ### Fixed:
 - The package could not be used from TypeScript due to a mislabeled default export. (Thanks, [duro](https://github.com/launchdarkly/node-server-sdk-dynamodb/pull/9)!)
