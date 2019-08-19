@@ -8,6 +8,8 @@ The minimum version of the LaunchDarkly Node.js SDK for use with this library is
 
 For more information, see also: [Using a persistent feature store](https://docs.launchdarkly.com/v2.0/docs/using-a-persistent-feature-store).
 
+TypeScript API documentation is [here](https://launchdarkly.github.io/node-server-sdk-dynamodb).
+
 ## Quick setup
 
 This assumes that you have already installed the LaunchDarkly Node.js SDK.
