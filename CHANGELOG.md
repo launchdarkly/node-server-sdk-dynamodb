@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.1.8] - 2020-02-12
+### Fixed:
+- If diagnostic events are enabled (in Node SDK 5.11.0 and above), the SDK will correctly report its data store type as &#34;DynamoDB&#34; rather than &#34;custom&#34;. This change has no effect in earlier versions of the Node SDK.
+
 ## [1.1.7] - 2019-08-18
 ### Added:
 - Generated HTML documentation.
