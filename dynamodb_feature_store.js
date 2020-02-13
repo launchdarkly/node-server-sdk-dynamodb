@@ -11,7 +11,7 @@ function DynamoDBFeatureStore(tableName, options) {
   if (ttl === null || ttl === undefined) {
     ttl = defaultCacheTTLSeconds;
   }
-  return new CachingStoreWrapper(dynamoDBFeatureStoreInternal(tableName, options), ttl);
+  return new CachingStoreWrapper(dynamoDBFeatureStoreInternal(tableName, options), ttl, 'DynamoDB');
 }
 
 function dynamoDBFeatureStoreInternal(tableName, options) {
