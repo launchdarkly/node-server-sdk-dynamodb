@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>LDDynamoDBOptions | LaunchDarkly Server-Side Node SDK DynamoDB Integration (1.1.7)</title>
+	<title>LDDynamoDBOptions | LaunchDarkly Server-Side Node SDK DynamoDB Integration (1.1.8)</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">LaunchDarkly Server-Side Node SDK DynamoDB Integration (1.1.7)</a>
+					<a href="../index.html" class="title">LaunchDarkly Server-Side Node SDK DynamoDB Integration (1.1.8)</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -66,13 +66,6 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Options for configuring a DynamoDBFeatureStore.</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -106,15 +99,9 @@
 					<div class="tsd-signature tsd-kind-icon">cacheTTL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/0beefa7/index.d.ts#L55">index.d.ts:55</a></li>
+							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/9312875/index.d.ts#L55">index.d.ts:55</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The expiration time for local caching, in seconds. To disable local caching, set this to zero.
-							If not specified, the default is 15 seconds.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="clientoptions" class="tsd-anchor"></a>
@@ -122,14 +109,9 @@
 					<div class="tsd-signature tsd-kind-icon">client<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DocumentClientOptions</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">DynamoDB.Types.ClientConfiguration</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/0beefa7/index.d.ts#L35">index.d.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/9312875/index.d.ts#L35">index.d.ts:35</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Options to be passed to the DynamoDB client constructor, as defined by the AWS SDK.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="dynamodbclient" class="tsd-anchor"></a>
@@ -137,16 +119,9 @@
 					<div class="tsd-signature tsd-kind-icon">dynamoDBClient<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DynamoDB.DocumentClient</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/0beefa7/index.d.ts#L42">index.d.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/9312875/index.d.ts#L42">index.d.ts:42</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Specifies an existing, already-configured DynamoDB client instance that the feature store
-								should use rather than creating one of its own. If you specify an existing client, then the
-							clientOptions property is ignored.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="logger" class="tsd-anchor"></a>
@@ -154,15 +129,9 @@
 					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">LDLogger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/0beefa7/index.d.ts#L61">index.d.ts:61</a></li>
+							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/9312875/index.d.ts#L61">index.d.ts:61</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>A logger to be used for warnings and errors generated by the feature store. If not specified,
-							the default is an instance of winston.Logger.</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="prefix" class="tsd-anchor"></a>
@@ -170,16 +139,9 @@
 					<div class="tsd-signature tsd-kind-icon">prefix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/0beefa7/index.d.ts#L49">index.d.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/9312875/index.d.ts#L49">index.d.ts:49</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>An optional namespace prefix for all keys stored in DynamoDB. Use this if you are sharing
-								the same database table between multiple clients that are for different LaunchDarkly
-							environments, to avoid key collisions.</p>
-						</div>
-					</div>
 				</section>
 			</section>
 		</div>
