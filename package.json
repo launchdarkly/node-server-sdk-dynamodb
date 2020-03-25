@@ -1,6 +1,6 @@
 {
   "name": "launchdarkly-node-server-sdk-dynamodb",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "DynamoDB-backed feature store for the LaunchDarkly Node.js SDK",
   "main": "dynamodb_feature_store.js",
   "license": "Apache-2.0",
