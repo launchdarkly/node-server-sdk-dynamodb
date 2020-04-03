@@ -20,11 +20,17 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
         npm install launchdarkly-node-server-sdk-dynamodb --save
 
-3. Require the package:
+3. If your application does not already have its own dependency on the `aws-sdk` package, and if it will _not_ be running in AWS Lambda, add `aws-sdk` as well:
+
+        npm install aws-sdk --save
+
+    The `launchdarkly-node-server-sdk-dynamodb` package does not provide `aws-sdk` as a transitive dependency, because it is provided automatically by the Lambda runtime and this would unnecessarily increase the size of applications deployed in Lambda. Therefore, if you are not using Lambda you need to provide `aws-sdk` separately.
+
+4. Require the package:
 
         var DynamoDBFeatureStore = require('launchdarkly-node-server-sdk-dynamodb');
 
-4. When configuring your SDK client, add the DynamoDB feature store:
+5. When configuring your SDK client, add the DynamoDB feature store:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME');
         var config = { featureStore: store };
@@ -39,12 +45,12 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { dynamoDBClient: myDynamoDBClientInstance });
 
-5. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
+6. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
 
         var config = { featureStore: store, useLdd: true };
         var client = LaunchDarkly.init('YOUR SDK KEY', config);
 
-6. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
+7. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
 
         var store = DynamoDBFeatureStore('YOUR TABLE NAME', { prefix: 'env1' });
 
