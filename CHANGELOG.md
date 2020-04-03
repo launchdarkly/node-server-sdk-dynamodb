@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [2.0.0] - 2020-04-03
+### Changed:
+- The `aws-sdk` dependency has been changed to a _peer_ dependency, so it is not automatically loaded by NPM. This greatly reduces application bundle size when deploying to AWS Lambda, because Lambda provides `aws-sdk` automatically in the container environment. Applications that do not run in Lambda must now add `aws-sdk` explicitly in their own dependencies in order to use this package. ([#12](https://github.com/launchdarkly/node-server-sdk-dynamodb/issues/12))
+
 ## [1.1.9] - 2020-03-25
 ### Removed:
 - The package dependencies mistakenly included `typedoc`. ([#12](https://github.com/launchdarkly/node-server-sdk-dynamodb/issues/12))
