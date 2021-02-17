@@ -1,4 +1,4 @@
-var AWS = require('aws-sdk');
+var DynamoDB = require('aws-sdk/clients/dynamodb');
 var winston = require('winston');
 
 var helpers = require('./dynamodb_helpers');
@@ -24,7 +24,7 @@ function dynamoDBFeatureStoreInternal(tableName, options) {
       ]
     })
   );
-  var dynamoDBClient = options.dynamoDBClient || new AWS.DynamoDB.DocumentClient(options.clientOptions);
+  var dynamoDBClient = options.dynamoDBClient || new DynamoDB.DocumentClient(options.clientOptions);
   var prefix = options.prefix || '';
 
   var store = {};
