@@ -1,6 +1,6 @@
 # Contributing to this library
 
-The source code for this library is [here](https://github.com/launchdarkly/node-server-sdk-dynamodb). We encourage pull-requests and other contributions from the community. Since this library is meant to be used in conjunction with the LaunchDarkly Server-Side Node.js SDK, you may want to look at the [SDK source code](https://github.com/launchdarkly/dotnet-server-sdk) and our [SDK contributor's guide](http://docs.launchdarkly.com/docs/sdk-contributors-guide).
+The source code for this library is [here](https://github.com/launchdarkly/node-server-sdk-dynamodb). We encourage pull-requests and other contributions from the community. Since this library is meant to be used in conjunction with the LaunchDarkly Server-Side Node.js SDK, you may want to look at the [SDK source code](https://github.com/launchdarkly/node-server-sdk) and our [SDK contributor's guide](http://docs.launchdarkly.com/docs/sdk-contributors-guide).
 
 ## Submitting bug reports and feature requests
  
