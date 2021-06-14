@@ -33,8 +33,7 @@
     "transformIgnorePatterns": []
   },
   "dependencies": {
-    "node-cache": "4.2.0",
-    "winston": "2.4.1"
+    "node-cache": "4.2.0"
   },
   "peerDependencies": {
     "aws-sdk": "^2.349.0",
