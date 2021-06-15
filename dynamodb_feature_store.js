@@ -1,5 +1,4 @@
 var AWS = require('aws-sdk');
-var winston = require('winston');
 
 var helpers = require('./dynamodb_helpers');
 var CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
@@ -11,19 +10,17 @@ function DynamoDBFeatureStore(tableName, options) {
   if (ttl === null || ttl === undefined) {
     ttl = defaultCacheTTLSeconds;
   }
-  return new CachingStoreWrapper(dynamoDBFeatureStoreInternal(tableName, options), ttl, 'DynamoDB');
+  return config =>
+    new CachingStoreWrapper(
+      dynamoDBFeatureStoreInternal(tableName, options, config.logger),
+      ttl,
+      'DynamoDB'
+    );
 }
 
-function dynamoDBFeatureStoreInternal(tableName, options) {
+function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
   options = options || {};
-  var logger = (options.logger ||
-    new winston.Logger({
-      level: 'info',
-      transports: [
-        new (winston.transports.Console)(),
-      ]
-    })
-  );
+  var logger = options.logger || sdkLogger;
   var dynamoDBClient = options.dynamoDBClient || new AWS.DynamoDB.DocumentClient(options.clientOptions);
   var prefix = options.prefix || '';
 
