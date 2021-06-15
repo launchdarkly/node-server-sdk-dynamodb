@@ -2,6 +2,12 @@ publications:
   - url: https://www.npmjs.com/package/launchdarkly-node-server-sdk-dynamodb
     description: npm
 
+releasableBranches:
+  - name: master
+    description: 3.x
+  - name: 2.x
+  - name: 1.x
+
 template:
   name: npm
   skip:
