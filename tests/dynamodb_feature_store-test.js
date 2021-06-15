@@ -25,6 +25,8 @@ describe('DynamoDBFeatureStore', function() {
 
   var table = 'test-store';
 
+  const sdkConfig = { logger: stubLogger() };
+
   beforeAll(function(done) {
     dynamodb.describeTable({ TableName: table }, function(err) {
       if (!err) {
@@ -93,15 +95,15 @@ describe('DynamoDBFeatureStore', function() {
   }
 
   function makeStore() {
-    return new DynamoDBFeatureStore(table);
+    return DynamoDBFeatureStore(table)(sdkConfig);
   }
 
   function makeStoreWithoutCache() {
-    return new DynamoDBFeatureStore(table, {cacheTTL: 0});
+    return DynamoDBFeatureStore(table, {cacheTTL: 0})(sdkConfig);
   }
 
   function makeStoreWithPrefix(prefix) {
-    return new DynamoDBFeatureStore(table, {prefix: prefix, cacheTTL: 0});
+    return DynamoDBFeatureStore(table, {prefix: prefix, cacheTTL: 0})(sdkConfig);
   }
 
   function makeStoreWithDefaultPrefix() {
@@ -139,7 +141,7 @@ describe('DynamoDBFeatureStore', function() {
     beforeEach(() => {
       client = {};
       logger = stubLogger();
-      store = new DynamoDBFeatureStore(table, { dynamoDBClient: client, logger: logger });
+      store = DynamoDBFeatureStore(table, { dynamoDBClient: client })({ logger });
     });
 
     it('error from query in init', done => {
