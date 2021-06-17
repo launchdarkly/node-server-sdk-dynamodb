@@ -2,6 +2,15 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [3.0.0] - 2021-06-17
+The 3.0.0 release of `launchdarkly-node-server-sdk-dynamodb` is for use with version 6.x of the LaunchDarkly server-side SDK for Node.js. It has the same functionality as the previous major version, but its dependencies, Node version compatibility, and internal API have been updated to match the 6.0.0 release of the SDK.
+
+This version still uses the v2 AWS SDK. A future version will provide compatibility with the v3 AWS SDK; but as of this release, the v2 AWS SDK is still what is bundled in AWS Lambda runtimes, so using it allows Lambda code bundles to be smaller.
+
+### Changed:
+- The minimum Node.js version is now 12.
+- The package no longer has a dependency on `winston`. It still allows you to configure a custom logger, but if you do not, it will use whatever logging configuration the SDK is using.
+
 ## [2.0.0] - 2020-04-03
 ### Changed:
 - The `aws-sdk` dependency has been changed to a _peer_ dependency, so it is not automatically loaded by NPM. This greatly reduces application bundle size when deploying to AWS Lambda, because Lambda provides `aws-sdk` automatically in the container environment. Applications that do not run in Lambda must now add `aws-sdk` explicitly in their own dependencies in order to use this package. ([#12](https://github.com/launchdarkly/node-server-sdk-dynamodb/issues/12))
