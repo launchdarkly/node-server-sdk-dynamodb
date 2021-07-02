@@ -8,25 +8,38 @@
 
 declare module 'launchdarkly-node-server-sdk-dynamodb' {
   import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
+  import * as ld from 'launchdarkly-node-server-sdk';
   import { DynamoDB } from 'aws-sdk';
 
   /**
    * Create a feature flag store backed by DynamoDB.
+   * 
+   * @param tableName The table name in DynamoDB (required). The table must already exist.
+   *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb
+   * @param options Additional options for configuring the DynamoDB store's behavior.
    */
-  export default function DynamoDBFeatureStore(
-    /**
-     * The table name in DynamoDB. This table must already exist (see readme).
-     */
+  export function DynamoDBFeatureStore(
     tableName: string,
-
-    /**
-     * Options for configuring the feature store.
-     */
     options?: LDDynamoDBOptions
   ): (config: LDOptions) => LDFeatureStore;
 
   /**
-   * Options for configuring a DynamoDBFeatureStore.
+   * Configures a big segment store backed by a Redis instance.
+   * 
+   * "Big segments" are a specific type of user segments. For more information, read the
+   * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users
+   *
+   * @param tableName The table name in DynamoDB (required). The table must already exist.
+   *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb
+   * @param options Additional options for configuring the DynamoDB store's behavior.
+   */
+  export function DynamoDBBigSegmentStore(
+    tableName: string,
+    options?: LDDynamoDBOptions
+  ): (config: LDOptions) => ld.interfaces.BigSegmentStore;
+
+  /**
+   * Options for configuring [[DynamoDBFeatureStore]] or [[DynamoDBBigSegmentStore]].
    */
   export interface LDDynamoDBOptions {
     /**
@@ -49,8 +62,14 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
     prefix?: string;
 
     /**
-     * The expiration time for local caching, in seconds. To disable local caching, set this to zero.
-     * If not specified, the default is 15 seconds.
+     * The amount of time, in seconds, that recently read or updated items should remain in an
+     * in-memory cache. If it is zero, there will be no in-memory caching.
+     * 
+     * This parameter applies only to [[DynamoDBFeatureStore]]. It is ignored for [[DynamoDBBigSegmentStore]].
+     * Caching for [[DynamoDBBigSegmentStore]] is configured separately, in the SDK's
+     * `LDBigSegmentsOptions` type, since it is independent of what database implementation is used.
+     * 
+     * If omitted, the default value is 15 seconds.
      */
     cacheTTL?: number;
 

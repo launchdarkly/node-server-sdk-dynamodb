@@ -1,15 +1,19 @@
-var AWS = require('aws-sdk');
+const { initState, batchWrite, queryHelper } = require('./dynamodb_helpers');
+const CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 
-var helpers = require('./dynamodb_helpers');
-var CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
+const defaultCacheTTLSeconds = 15;
 
-var defaultCacheTTLSeconds = 15;
+// Note that the format of parameters in this implementation is a bit different than in the
+// LD DynamoDB integrations for some other platforms, because we are using the
+// AWS.DynamoDB.DocumentClient class, which represents values as simple types like
+// string or number, rather than in the { S: stringValue } or { N: numericStringValue }
+// format used by the basic AWS DynamoDB API.
 
-function DynamoDBFeatureStore(tableName, options) {
-  var ttl = options && options.cacheTTL;
-  if (ttl === null || ttl === undefined) {
-    ttl = defaultCacheTTLSeconds;
-  }
+function DynamoDBFeatureStore(tableName, maybeOptions) {
+  const options = maybeOptions || {};
+  const ttl = options.cacheTTL !== null && options.cacheTTL !== undefined
+    ? options.cacheTTL
+    : defaultCacheTTLSeconds;
   return config =>
     new CachingStoreWrapper(
       dynamoDBFeatureStoreInternal(tableName, options, config.logger),
@@ -18,13 +22,12 @@ function DynamoDBFeatureStore(tableName, options) {
     );
 }
 
-function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
-  options = options || {};
-  var logger = options.logger || sdkLogger;
-  var dynamoDBClient = options.dynamoDBClient || new AWS.DynamoDB.DocumentClient(options.clientOptions);
-  var prefix = options.prefix || '';
+function dynamoDBFeatureStoreInternal(tableName, options, logger) {
+  const state = initState(options);
+  const dynamoDBClient = state.client;
+  const prefix = state.prefix;
 
-  var store = {};
+  const store = {};
 
   store.getInternal = function(kind, key, cb) {
     dynamoDBClient.get({
@@ -47,7 +50,7 @@ function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
 
   store.getAllInternal = function(kind, cb) {
     var params = queryParamsForNamespace(kind.namespace);
-    helpers.queryHelper(dynamoDBClient, params).then(function (items) {
+    queryHelper(dynamoDBClient, params).then(function (items) {
       var results = {};
       for (var i = 0; i < items.length; i++) {
         var item = unmarshalItem(items[i]);
@@ -90,7 +93,7 @@ function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
         // Always write the initialized token when we initialize.
         ops.push({ PutRequest: { Item: initializedToken() } });
 
-        var writePromises = helpers.batchWrite(dynamoDBClient, tableName, ops);
+        var writePromises = batchWrite(dynamoDBClient, tableName, ops);
     
         return Promise.all(writePromises);
       })
@@ -149,7 +152,7 @@ function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
       TableName: tableName,
       KeyConditionExpression: 'namespace = :namespace',
       FilterExpression: 'attribute_not_exists(deleted) OR deleted = :deleted',
-      ExpressionAttributeValues: { ':namespace': prefixedNamespace(namespace), ':deleted': false }
+      ExpressionAttributeValues: { ':namespace': prefix + namespace, ':deleted': false }
     };
   }
 
@@ -159,7 +162,7 @@ function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
       var namespace = collection.kind.namespace;
       p = p.then(function(previousItems) {
         var params = queryParamsForNamespace(namespace);
-        return helpers.queryHelper(dynamoDBClient, params).then(function (items) {
+        return queryHelper(dynamoDBClient, params).then(function (items) {
           return previousItems.concat(items);
         });
       });
@@ -167,16 +170,12 @@ function dynamoDBFeatureStoreInternal(tableName, options, sdkLogger) {
     return p;
   }
 
-  function prefixedNamespace(baseNamespace) {
-    return prefix ? (prefix + ':' + baseNamespace) : baseNamespace;
-  }
-
   function namespaceForKind(kind) {
-    return prefixedNamespace(kind.namespace);
+    return prefix + kind.namespace;
   }
 
   function initializedToken() {
-    var value = prefixedNamespace('$inited');
+    var value = prefix + '$inited';
     return { namespace: value, key: value };
   }
 

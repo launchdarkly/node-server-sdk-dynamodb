@@ -2,10 +2,10 @@
   "name": "launchdarkly-node-server-sdk-dynamodb",
   "version": "3.0.0",
   "description": "DynamoDB-backed feature store for the LaunchDarkly Node.js SDK",
-  "main": "dynamodb_feature_store.js",
+  "main": "index.js",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "jest --ci --forceExit",
+    "test": "jest --ci",
     "check-typescript": "node_modules/typescript/bin/tsc",
     "lint": "eslint --format 'node_modules/eslint-formatter-pretty' --ignore-path .eslintignore ."
   },
@@ -23,7 +23,7 @@
     "jest": "^27.0.4",
     "jest-junit": "^12.2.0",
     "launchdarkly-js-test-helpers": "^1.2.1",
-    "launchdarkly-node-server-sdk": "^6.0.0",
+    "launchdarkly-node-server-sdk": "6.2.0-alpha.bigsegments.3",
     "prettier": "^2.3.1",
     "typescript": "^4.3.2"
   },
@@ -41,7 +41,7 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.349.0",
-    "launchdarkly-node-server-sdk": "^6.0.0"
+    "launchdarkly-node-server-sdk": "6.2.0-alpha.bigsegments.3"
   },
   "engines": {
     "node": ">= 12.0"
