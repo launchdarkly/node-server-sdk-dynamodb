@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "module": "commonjs",
-    "strict": true,
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "dist",
     "lib": [
-      "es6"
+      "es2015"
     ]
   },
-  "files": [
-    "index.d.ts",
-    "test-types.ts"
+  "exclude": [
+    "dist/**/*",
+    "test/**/*"
   ]
 }

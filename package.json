@@ -2,39 +2,31 @@
   "name": "launchdarkly-node-server-sdk-dynamodb",
   "version": "3.0.0",
   "description": "DynamoDB-backed feature store for the LaunchDarkly Node.js SDK",
-  "main": "index.js",
   "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
+    "prepublish": "npm run build",
+    "build": "tsc",
     "test": "jest --ci",
-    "check-typescript": "node_modules/typescript/bin/tsc",
-    "lint": "eslint --format 'node_modules/eslint-formatter-pretty' --ignore-path .eslintignore ."
+    "lint": "eslint --cache --ext .ts src test"
   },
-  "types": "./index.d.ts",
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.5",
-    "@types/node": "^15.12.2",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.3.1",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
     "aws-sdk": "^2.349.0",
-    "babel-jest": "^27.0.2",
-    "eslint": "^7.28.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-formatter-pretty": "^4.1.0",
-    "eslint-plugin-prettier": "^3.4.0",
+    "eslint": "^7.30.0",
     "jest": "^27.0.4",
     "jest-junit": "^12.2.0",
     "launchdarkly-js-test-helpers": "^1.2.1",
     "launchdarkly-node-server-sdk": "6.2.0-alpha.bigsegments.3",
-    "prettier": "^2.3.1",
+    "ts-jest": "^27.0.0",
     "typescript": "^4.3.2"
-  },
-  "jest": {
-    "rootDir": ".",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/*-test.js"
-    ],
-    "testResultsProcessor": "jest-junit",
-    "transformIgnorePatterns": []
   },
   "dependencies": {
     "node-cache": "4.2.0"

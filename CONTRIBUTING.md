@@ -37,9 +37,3 @@ The tests expect you to have DynamoDB running locally on the default port, 6379.
 ```bash
 docker run -p 8000:8000 amazon/dynamodb-local
 ```
-
-To verify that the TypeScript declarations compile correctly (this involves compiling the file `test-types.ts`, so if you have changed any types or interfaces, you will want to update that code):
-
-```
-npm run check-typescript
-```
