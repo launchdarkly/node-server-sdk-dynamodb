@@ -3,14 +3,12 @@ import { LDDynamoDBOptions } from './options';
 import * as AWS from 'aws-sdk';
 import { promisify } from 'util';
 
-export const defaultPrefix = 'launchdarkly';
-
 export class BaseDynamoDB {
   public prefix: string;
   public client: AWS.DynamoDB.DocumentClient;
 
   public constructor(options: LDDynamoDBOptions) {
-    this.prefix = optionalPrefix(options.prefix || defaultPrefix);
+    this.prefix = optionalPrefix(options.prefix);
 
     if (options.dynamoDBClient) {
       this.client = options.dynamoDBClient;

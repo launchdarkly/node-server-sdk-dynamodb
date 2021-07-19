@@ -2,7 +2,12 @@ import { BaseDynamoDB } from './base';
 import { LDDynamoDBOptions } from './options';
 
 import * as AWS from 'aws-sdk';
-import * as ld from 'launchdarkly-node-server-sdk';
+import { LDBigSegmentsOptions, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
+import {
+  BigSegmentStore,
+  BigSegmentStoreMembership,
+  BigSegmentStoreMetadata,
+} from 'launchdarkly-node-server-sdk/interfaces';
 import { promisify } from 'util';
 
 export const keyMetadata = 'big_segments_metadata';
@@ -22,14 +27,14 @@ export const attrExcluded = 'excluded';
  *
  * @returns
  *   A factory function that the SDK will use to create the store. Put this value into the
- *   `store` property of [[ld.interfaces.BigSegmentsOptions]].
+ *   `store` property of [[LDBigSegmentsOptions]].
  */
 export function DynamoDBBigSegmentStore(tableName: string, options?: LDDynamoDBOptions):
-    (config: ld.LDOptions) => ld.interfaces.BigSegmentStore {
+    (config: LDOptions) => BigSegmentStore {
   return (config) => new BigSegmentStoreImpl(tableName, options || {}, config.logger);
 }
 
-class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
+class BigSegmentStoreImpl implements BigSegmentStore {
   private state: BaseDynamoDB;
   private client: AWS.DynamoDB.DocumentClient;
   private prefix: string;
@@ -37,7 +42,7 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
   // Pre-promisify these methods for efficiency
   private clientGet: (params: AWS.DynamoDB.DocumentClient.GetItemInput) => Promise<AWS.DynamoDB.DocumentClient.GetItemOutput>;
 
-  public constructor(public tableName: string, options: LDDynamoDBOptions, public logger: ld.LDLogger) {
+  public constructor(public tableName: string, options: LDDynamoDBOptions, public logger: LDLogger) {
     this.state = new BaseDynamoDB(options);
     this.client = this.state.client;
     this.prefix = this.state.prefix;
@@ -47,7 +52,7 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
     this.clientGet = promisify(this.client.get.bind(this.client));
   }
 
-  public async getMetadata(): Promise<ld.interfaces.BigSegmentStoreMetadata> {
+  public async getMetadata(): Promise<BigSegmentStoreMetadata> {
     const key = this.prefix + keyMetadata;
     const data = await this.clientGet({
       TableName: this.tableName,
@@ -62,7 +67,7 @@ class BigSegmentStoreImpl implements ld.interfaces.BigSegmentStore {
     return { lastUpToDate: undefined };
   }
 
-  public async getUserMembership(userHash: string): Promise<ld.interfaces.BigSegmentStoreMembership> {
+  public async getUserMembership(userHash: string): Promise<BigSegmentStoreMembership> {
     const data = await this.clientGet({
       TableName: this.tableName,
       Key: {

@@ -5,7 +5,7 @@ import { DynamoDBBigSegmentStore, DynamoDBFeatureStore } from '../src/index';
 
 import * as AWS from 'aws-sdk';
 import { sleepAsync } from 'launchdarkly-js-test-helpers';
-import * as ld from 'launchdarkly-node-server-sdk';
+import { LDLogger } from 'launchdarkly-node-server-sdk';
 import * as dataKind from 'launchdarkly-node-server-sdk/versioned_data_kind';
 import {
   runBigSegmentStoreTests,
@@ -39,7 +39,7 @@ async function clearData(prefix) {
   const items: AWS.DynamoDB.DocumentClient.ItemList =
     await paginationHelper({TableName: testTableName}, params => promisify(client.scan.bind(client))(params));
   for (const item of items) {
-    if (actualPrefix && item.namespace.startsWith(actualPrefix)) {
+    if (!actualPrefix || item.namespace.startsWith(actualPrefix)) {
       ops.push({
         DeleteRequest: {
           TableName: testTableName,
@@ -59,13 +59,13 @@ describe('DynamoDBFeatureStore', function() {
     setupTable().then(done);
   });
 
-  function createStore(prefix: string, cacheTTL: number, logger: ld.LDLogger) {
+  function createStore(prefix: string, cacheTTL: number, logger: LDLogger) {
     return DynamoDBFeatureStore(testTableName, { prefix, cacheTTL })({ logger });
   }
 
   function createStoreWithConcurrentUpdateHook(
     prefix: string,
-    logger: ld.LDLogger,
+    logger: LDLogger,
     hook: (callback: () => void) => void,
   ) {
     const store = createStore(prefix, 0, logger);
@@ -88,7 +88,7 @@ describe('DynamoDBFeatureStore', function() {
   describe('handling errors from DynamoDB client', function() {
     const err = new Error('error');
     let client: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-    let logger: ld.LDLogger;
+    let logger: LDLogger;
 
     beforeEach(() => {
       client = {

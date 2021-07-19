@@ -1,10 +1,16 @@
 import { BaseDynamoDB } from './base';
 import { batchWrite, queryHelper } from './base';
-import { DataKind, DataCollection, KeyedItems, VersionedData } from './feature_store_types';
 import { LDDynamoDBOptions } from './options';
 
 import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
-import * as CachingStoreWrapper from 'launchdarkly-node-server-sdk/caching_store_wrapper';
+import {
+  DataCollection,
+  DataKind,
+  FullDataSet,
+  KeyedItems,
+  VersionedData
+} from 'launchdarkly-node-server-sdk/interfaces';
+import CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_wrapper');
 import { promisify } from 'util';
 
 const defaultCacheTTLSeconds = 15;
@@ -86,12 +92,12 @@ export class DynamoDBFeatureStoreImpl { // exported for tests only
     })();
   }
 
-  public getAllInternal(kind: DataKind, callback: (items: KeyedItems) => void): void {
+  public getAllInternal(kind: DataKind, callback: (items: KeyedItems<VersionedData>) => void): void {
     const params = this.queryParamsForNamespace(kind.namespace);
     (async () => {
       try {
         const items = await queryHelper(this.client, params);
-        const results: KeyedItems = {};
+        const results: KeyedItems<VersionedData> = {};
         for (const dbItem of items) {
           const item = this.unmarshalItem(dbItem);
           if (item) {
@@ -106,7 +112,7 @@ export class DynamoDBFeatureStoreImpl { // exported for tests only
     })();
   }
 
-  public initOrderedInternal(allData: Array<DataCollection>, callback: () => void): void {
+  public initOrderedInternal(allData: Array<DataCollection<VersionedData>>, callback: () => void): void {
     (async () => {
       try {
         const existingItems = await this.readExistingItems(allData);
@@ -206,7 +212,7 @@ export class DynamoDBFeatureStoreImpl { // exported for tests only
     };
   }
 
-  private async readExistingItems(allData: Array<DataCollection>): Promise<AWS.DynamoDB.ItemList> {
+  private async readExistingItems(allData: Array<DataCollection<VersionedData>>): Promise<AWS.DynamoDB.ItemList> {
     let ret: AWS.DynamoDB.ItemList = [];
     for (const collection of allData) {
       const namespace = collection.kind.namespace;
