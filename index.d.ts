@@ -8,7 +8,7 @@
 
 declare module 'launchdarkly-node-server-sdk-dynamodb' {
   import { LDFeatureStore, LDLogger, LDOptions } from 'launchdarkly-node-server-sdk';
-  import * as ld from 'launchdarkly-node-server-sdk';
+  import { BigSegmentStore } from 'launchdarkly-node-server-sdk/interfaces';
   import { DynamoDB } from 'aws-sdk';
 
   /**
@@ -36,7 +36,7 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
   export function DynamoDBBigSegmentStore(
     tableName: string,
     options?: LDDynamoDBOptions
-  ): (config: LDOptions) => ld.interfaces.BigSegmentStore;
+  ): (config: LDOptions) => BigSegmentStore;
 
   /**
    * Options for configuring [[DynamoDBFeatureStore]] or [[DynamoDBBigSegmentStore]].

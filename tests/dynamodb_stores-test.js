@@ -41,7 +41,7 @@ async function clearData(prefix) {
   const ops = [];
   const items = await paginationHelper({TableName: testTableName}, function (params, cb) { client.scan(params, cb); });
   for (var i = 0; i < items.length; i++) {
-    if (actualPrefix && items[i].namespace.startsWith(actualPrefix)) {
+    if (!actualPrefix || items[i].namespace.startsWith(actualPrefix)) {
       ops.push({
         DeleteRequest: {
           TableName: testTableName,
