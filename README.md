@@ -4,7 +4,7 @@
 
 This library provides a DynamoDB-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-server-sdk), replacing the default in-memory feature store. It uses the AWS SDK for Node.js.
 
-The minimum version of the LaunchDarkly Node.js SDK for use with this library is 6.0.0.
+The minimum version of the LaunchDarkly Node.js SDK for use with this library is 6.2.0.
 
 For more information, see the [SDK features guide](https://docs.launchdarkly.com/sdk/features/database-integrations).
 
@@ -28,37 +28,37 @@ This assumes that you have already installed the LaunchDarkly Node.js SDK.
 
 4. Require the package:
 
-        var DynamoDBFeatureStore = require('launchdarkly-node-server-sdk-dynamodb');
+        const { DynamoDBFeatureStore } = require('launchdarkly-node-server-sdk-dynamodb');
 
 5. When configuring your SDK client, add the DynamoDB feature store:
 
-        var store = DynamoDBFeatureStore('YOUR TABLE NAME');
-        var config = { featureStore: store };
-        var client = LaunchDarkly.init('YOUR SDK KEY', config);
+        const store = DynamoDBFeatureStore('YOUR TABLE NAME');
+        const config = { featureStore: store };
+        const client = LaunchDarkly.init('YOUR SDK KEY', config);
 
     By default, the DynamoDB client will try to get your AWS credentials and region name from environment variables and/or local configuration files, as described in the AWS SDK documentation. You can also specify any valid [DynamoDB client options](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#constructor-property) like this:
 
-        var dynamoDBOptions = { accessKeyId: 'YOUR KEY', secretAccessKey: 'YOUR SECRET' };
-        var store = DynamoDBFeatureStore('YOUR TABLE NAME', { clientOptions: dynamoDBOptions });
+        const dynamoDBOptions = { accessKeyId: 'YOUR KEY', secretAccessKey: 'YOUR SECRET' };
+        const store = DynamoDBFeatureStore('YOUR TABLE NAME', { clientOptions: dynamoDBOptions });
 
     Alternatively, if you already have a fully configured DynamoDB client object, you can tell LaunchDarkly to use that:
 
-        var store = DynamoDBFeatureStore('YOUR TABLE NAME', { dynamoDBClient: myDynamoDBClientInstance });
+        const store = DynamoDBFeatureStore('YOUR TABLE NAME', { dynamoDBClient: myDynamoDBClientInstance });
 
 6. If you are running a [LaunchDarkly Relay Proxy](https://github.com/launchdarkly/ld-relay) instance, or any other process that will prepopulate the DynamoDB table with feature flags from LaunchDarkly, you can use [daemon mode](https://github.com/launchdarkly/ld-relay#daemon-mode), so that the SDK retrieves flag data only from DynamoDB and does not communicate directly with LaunchDarkly. This is controlled by the SDK's `useLdd` option:
 
-        var config = { featureStore: store, useLdd: true };
-        var client = LaunchDarkly.init('YOUR SDK KEY', config);
+        const config = { featureStore: store, useLdd: true };
+        const client = LaunchDarkly.init('YOUR SDK KEY', config);
 
 7. If the same DynamoDB table is being shared by SDK clients for different LaunchDarkly environments, set the `prefix` option to a different short string for each one to keep the keys from colliding:
 
-        var store = DynamoDBFeatureStore('YOUR TABLE NAME', { prefix: 'env1' });
+        const store = DynamoDBFeatureStore('YOUR TABLE NAME', { prefix: 'env1' });
 
 ## Caching behavior
 
 To reduce traffic to DynamoDB, there is an optional in-memory cache that retains the last known data for a configurable amount of time. This is on by default; to turn it off (and guarantee that the latest feature flag data will always be retrieved from DynamoDB for every flag evaluation), configure the store as follows:
 
-        var store = DynamoDBFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
+        const store = DynamoDBFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
 
 ## About LaunchDarkly
 

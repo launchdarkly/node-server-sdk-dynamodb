@@ -1,3 +1,27 @@
+const AWS = require('aws-sdk');
+
+function optionalPrefix(prefix) {
+  // Unlike some other database integrations where the key prefix is mandatory and has
+  // a default value, in DynamoDB it is fine to not have a prefix. If there is one, we
+  // prepend it to keys with a ':' separator.
+  return prefix ? prefix + ':' : '';
+}
+
+function initState(options) {
+  const state = {
+    prefix: optionalPrefix(options.prefix)
+  };
+
+  if (options.dynamoDBClient) {
+    state.client = options.dynamoDBClient;
+  } else {
+    state.client = new AWS.DynamoDB.DocumentClient(options.clientOptions);
+  }
+  // Unlike some other database integrations, we don't need to keep track of whether we
+  // created our own client so as to shut it down later; the AWS client is stateless.
+  
+  return state;
+}
 
 function paginationHelper(params, executeFn, startKey) {
   return new Promise(function(resolve, reject) {
@@ -43,7 +67,9 @@ function batchWrite(client, tableName, ops) {
 }
 
 module.exports = {
-  batchWrite: batchWrite,
-  paginationHelper: paginationHelper,
-  queryHelper: queryHelper
+  initState,
+  optionalPrefix,
+  batchWrite,
+  paginationHelper,
+  queryHelper
 };
