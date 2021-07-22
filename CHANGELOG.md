@@ -2,6 +2,29 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [4.0.0] - 2021-07-22
+### Added:
+- Added support for Big Segments. An Early Access Program for creating and syncing Big Segments from customer data platforms is available to enterprise customers.
+
+### Changed:
+- `DynamoDBFeatureStore` is now a named export, not a default export. This breaking change was made because the package now has an additional named export (`DynamoDBBigSegmentStore`). There are no other backward-incompatible changes in the package.
+
+To update existing code for this version, change your imports like so:
+
+```js
+// BEFORE:
+// CommonJS style
+const DynamoDBFeatureStore = require(&#39;launchdarkly-node-server-sdk-dynamodb&#39;);
+// or ES6 style
+import DynamoDBFeatureStore from &#39;launchdarkly-node-server-sdk-dynamodb&#39;;
+
+// AFTER:
+// CommonJS style
+const { DynamoDBFeatureStore } = require(&#39;launchdarkly-node-server-sdk-dynamodb&#39;);
+// or ES6 style
+import { DynamoDBFeatureStore } from &#39;launchdarkly-node-server-sdk-dynamodb&#39;;
+```
+
 ## [3.0.0] - 2021-06-17
 The 3.0.0 release of `launchdarkly-node-server-sdk-dynamodb` is for use with version 6.x of the LaunchDarkly server-side SDK for Node.js. It has the same functionality as the previous major version, but its dependencies, Node version compatibility, and internal API have been updated to match the 6.0.0 release of the SDK.
 
