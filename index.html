@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;launchdarkly-node-server-sdk-dynamodb&quot; | LaunchDarkly Server-Side Node SDK DynamoDB Integration (3.0.0)</title>
-	<meta name="description" content="Documentation for LaunchDarkly Server-Side Node SDK DynamoDB Integration (3.0.0)">
+	<title>&quot;launchdarkly-node-server-sdk-dynamodb&quot; | LaunchDarkly Server-Side Node SDK DynamoDB Integration (4.0.0)</title>
+	<meta name="description" content="Documentation for LaunchDarkly Server-Side Node SDK DynamoDB Integration (4.0.0)">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">LaunchDarkly Server-Side Node SDK DynamoDB Integration (3.0.0)</a>
+					<a href="index.html" class="title">LaunchDarkly Server-Side Node SDK DynamoDB Integration (4.0.0)</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -84,6 +84,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="index.html#dynamodbbigsegmentstore" class="tsd-kind-icon">DynamoDBBig<wbr>Segment<wbr>Store</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="index.html#dynamodbfeaturestore" class="tsd-kind-icon">DynamoDBFeature<wbr>Store</a></li>
 							</ul>
 						</section>
@@ -92,6 +93,64 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="dynamodbbigsegmentstore" class="tsd-anchor"></a>
+					<h3>DynamoDBBig<wbr>Segment<wbr>Store</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">DynamoDBBig<wbr>Segment<wbr>Store<span class="tsd-signature-symbol">(</span>tableName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/_launchdarkly_node_server_sdk_dynamodb_.lddynamodboptions.html" class="tsd-signature-type">LDDynamoDBOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LDOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">BigSegmentStore</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/267069a/index.d.ts#L36">index.d.ts:36</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Configures a big segment store backed by a Redis instance.</p>
+								</div>
+								<p>&quot;Big segments&quot; are a specific type of user segments. For more information, read the
+								LaunchDarkly documentation about user segments: <a href="https://docs.launchdarkly.com/home/users">https://docs.launchdarkly.com/home/users</a></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tableName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The table name in DynamoDB (required). The table must already exist.
+										See: <a href="https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb">https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb</a></p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/_launchdarkly_node_server_sdk_dynamodb_.lddynamodboptions.html" class="tsd-signature-type">LDDynamoDBOptions</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Additional options for configuring the DynamoDB store&#39;s behavior.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LDOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">BigSegmentStore</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter-signature">
+									<ul class="tsd-signatures tsd-kind-type-literal">
+										<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LDOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BigSegmentStore</span></li>
+									</ul>
+									<ul class="tsd-descriptions">
+										<li class="tsd-description">
+											<h4 class="tsd-parameters-title">Parameters</h4>
+											<ul class="tsd-parameters">
+												<li>
+													<h5>config: <span class="tsd-signature-type">LDOptions</span></h5>
+												</li>
+											</ul>
+											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">BigSegmentStore</span></h4>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="dynamodbfeaturestore" class="tsd-anchor"></a>
 					<h3>DynamoDBFeature<wbr>Store</h3>
@@ -102,7 +161,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/3206380/index.d.ts#L16">index.d.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/launchdarkly/node-server-sdk-dynamodb/blob/267069a/index.d.ts#L21">index.d.ts:21</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -114,9 +173,16 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tableName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The table name in DynamoDB (required). The table must already exist.
+										See: <a href="https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb">https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb</a></p>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/_launchdarkly_node_server_sdk_dynamodb_.lddynamodboptions.html" class="tsd-signature-type">LDDynamoDBOptions</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Additional options for configuring the DynamoDB store&#39;s behavior.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LDOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">LDFeatureStore</span></h4>
@@ -155,6 +221,9 @@
 				<ul class="before-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="interfaces/_launchdarkly_node_server_sdk_dynamodb_.lddynamodboptions.html" class="tsd-kind-icon">LDDynamoDBOptions</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="index.html#dynamodbbigsegmentstore" class="tsd-kind-icon">DynamoDBBig<wbr>Segment<wbr>Store</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="index.html#dynamodbfeaturestore" class="tsd-kind-icon">DynamoDBFeature<wbr>Store</a>
