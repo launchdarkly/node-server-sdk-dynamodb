@@ -1,12 +1,11 @@
+const { DynamoDBBigSegmentStore, DynamoDBFeatureStore } = require('../index');
 const {
-  DynamoDBBigSegmentStore,
   keyMetadata,
   keyUserData,
   attrSyncTime,
   attrIncluded,
   attrExcluded,
 } = require('../dynamodb_big_segment_store');
-const DynamoDBFeatureStore = require('../dynamodb_feature_store');
 const { batchWrite, optionalPrefix, paginationHelper } = require('../dynamodb_helpers');
 const dataKind = require('launchdarkly-node-server-sdk/versioned_data_kind');
 const {
