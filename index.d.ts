@@ -3,7 +3,7 @@
 /**
  * Interface for the DynamoDB feature store component to be used with the LaunchDarkly SDK.
  *
- * See: https://docs.launchdarkly.com/sdk/features/database-integrations
+ * See: https://docs.launchdarkly.com/sdk/concepts/data-stores
  */
 
 declare module 'launchdarkly-node-server-sdk-dynamodb' {
@@ -13,7 +13,7 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
 
   /**
    * Create a feature flag store backed by DynamoDB.
-   * 
+   *
    * @param tableName The table name in DynamoDB (required). The table must already exist.
    *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb
    * @param options Additional options for configuring the DynamoDB store's behavior.
@@ -25,9 +25,9 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
 
   /**
    * Configures a big segment store backed by a Redis instance.
-   * 
+   *
    * "Big segments" are a specific type of user segments. For more information, read the
-   * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users
+   * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users/big-segments
    *
    * @param tableName The table name in DynamoDB (required). The table must already exist.
    *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb
@@ -57,18 +57,18 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
     /**
      * An optional namespace prefix for all keys stored in DynamoDB. Use this if you are sharing
      * the same database table between multiple clients that are for different LaunchDarkly
-     * environments, to avoid key collisions. 
+     * environments, to avoid key collisions.
      */
     prefix?: string;
 
     /**
      * The amount of time, in seconds, that recently read or updated items should remain in an
      * in-memory cache. If it is zero, there will be no in-memory caching.
-     * 
+     *
      * This parameter applies only to [[DynamoDBFeatureStore]]. It is ignored for [[DynamoDBBigSegmentStore]].
      * Caching for [[DynamoDBBigSegmentStore]] is configured separately, in the SDK's
      * `LDBigSegmentsOptions` type, since it is independent of what database implementation is used.
-     * 
+     *
      * If omitted, the default value is 15 seconds.
      */
     cacheTTL?: number;
