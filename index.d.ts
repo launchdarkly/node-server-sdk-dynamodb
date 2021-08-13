@@ -30,7 +30,7 @@ declare module 'launchdarkly-node-server-sdk-dynamodb' {
    * LaunchDarkly documentation about user segments: https://docs.launchdarkly.com/home/users/big-segments
    *
    * @param tableName The table name in DynamoDB (required). The table must already exist.
-   *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb#nodejs-server-side
+   *   See: https://docs.launchdarkly.com/sdk/features/storing-data/dynamodb
    * @param options Additional options for configuring the DynamoDB store's behavior.
    */
   export function DynamoDBBigSegmentStore(
