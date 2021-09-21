@@ -1,18 +1,23 @@
+version: 2
+
 publications:
   - url: https://www.npmjs.com/package/launchdarkly-node-server-sdk-dynamodb
     description: npm
 
-releasableBranches:
+branches:
   - name: master
     description: 3.x
   - name: 2.x
   - name: 1.x
 
-template:
-  name: npm
-  skip:
-    - test  # Running the unit tests would require installing DynamoDB. They've already been run in CI.
+jobs:
+  - docker:
+      image: node:12-buster
+    template:
+      name: npm
+      skip:
+        - test  # Running the unit tests would require installing DynamoDB. They've already been run in CI.
 
 documentation:
-  githubPages: true
+  gitHubPages: true
   title: LaunchDarkly Server-Side Node SDK DynamoDB Integration
