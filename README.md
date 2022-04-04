@@ -60,6 +60,22 @@ To reduce traffic to DynamoDB, there is an optional in-memory cache that retains
 
         const store = DynamoDBFeatureStore('YOUR TABLE NAME', { cacheTTL: 0 });
 
+## Data size limitation
+
+DynamoDB has [a 400KB limit](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html#limits-items) on the size of any data item. For the LaunchDarkly SDK, a data item consists of the JSON representation of an individual feature flag or segment configuration, plus a few smaller attributes. You can see the format and size of these representations by querying `https://sdk.launchdarkly.com/flags/latest-all` and setting the `Authorization` header to your SDK key.
+
+Most flags and segments won't be nearly as big as 400KB, but they could be if for instance you have a long list of user keys for individual user targeting. If the flag or segment representation is too large, it cannot be stored in DynamoDB. To avoid disrupting storage and evaluation of other unrelated feature flags, the SDK will simply skip storing that individual flag or segment, and will log a message (at ERROR level) describing the problem. For example:
+
+```
+    The item "my-flag-key" in "features" was too large to store in DynamoDB and was dropped
+```
+
+If caching is enabled in your configuration, the flag or segment may still be available in the SDK from the in-memory cache, but do not rely on this. If you see this message, consider redesigning your flag/segment configurations, or else do not use DynamoDB for the environment that contains this data item.
+
+This limitation does not apply to target lists in [Big Segments](https://docs.launchdarkly.com/home/users/big-segments/).
+
+A future version of the LaunchDarkly DynamoDB integration may use different strategies to work around this limitation, such as compressing the data or dividing it into multiple items. However, this integration is required to be interoperable with the DynamoDB integrations used by all the other LaunchDarkly SDKs and by the Relay Proxy, so any such change will only be made as part of a larger cross-platform release.
+
 ## About LaunchDarkly
 
 * LaunchDarkly is a continuous delivery platform that provides feature flags as a service and allows developers to iterate quickly and safely. We allow you to easily flag your features and manage them from the LaunchDarkly dashboard.  With LaunchDarkly, you can:
