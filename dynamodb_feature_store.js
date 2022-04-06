@@ -228,9 +228,10 @@ function dynamoDBFeatureStoreInternal(tableName, options, logger) {
   }
 
   function checkSizeLimit(item) {
-    let size = 0;
+    // see: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/CapacityUnitCalculations.html
+    let size = 100; // fixed overhead for index data
     for (const [key, value] of Object.entries(item)) {
-      size += key.length + value.toString().length;
+      size += key.length + Buffer.byteLength(value.toString());
     }
     if (size <= dynamoDbMaxItemSize) {
       return true;
