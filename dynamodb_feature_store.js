@@ -3,6 +3,11 @@ const CachingStoreWrapper = require('launchdarkly-node-server-sdk/caching_store_
 
 const defaultCacheTTLSeconds = 15;
 
+// We won't try to store items whose total size exceeds this. The DynamoDB documentation says
+// only "400KB", which probably means 400*1024, but to avoid any chance of trying to store a
+// too-large item we are rounding it down.
+const dynamoDbMaxItemSize = 400000;
+
 // Note that the format of parameters in this implementation is a bit different than in the
 // LD DynamoDB integrations for some other platforms, because we are using the
 // AWS.DynamoDB.DocumentClient class, which represents values as simple types like
@@ -79,8 +84,11 @@ function dynamoDBFeatureStoreInternal(tableName, options, logger) {
         allData.forEach(function(collection) {
           collection.items.forEach(function(item) {
             var key = item.key;
-            delete existingNamespaceKeys[namespaceForKind(collection.kind) + '$' + key];
-            ops.push({ PutRequest: { Item: marshalItem(collection.kind, item) } });
+            const dbItem = marshalItem(collection.kind, item);
+            if (checkSizeLimit(dbItem)) {
+              delete existingNamespaceKeys[namespaceForKind(collection.kind) + '$' + key];
+              ops.push({ PutRequest: { Item: dbItem } });
+            }
           });
         });
 
@@ -105,6 +113,12 @@ function dynamoDBFeatureStoreInternal(tableName, options, logger) {
 
   store.upsertInternal = function(kind, item, cb) {
     var params = makeVersionedPutRequest(kind, item);
+    if (!checkSizeLimit(params.Item)) {
+      // We deliberately don't report this back to the SDK as an error, because we don't want to trigger any
+      // useless retry behavior. We just won't do the update.
+      cb(null, null);
+      return;
+    }
 
     // testUpdateHook is instrumentation, used only by the unit tests
     var prepare = store.testUpdateHook || function(prepareCb) { prepareCb(); };
@@ -213,6 +227,23 @@ function dynamoDBFeatureStoreInternal(tableName, options, logger) {
     return item.namespace + '$' + item.key;
   }
 
+  function checkSizeLimit(item) {
+    // see: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/CapacityUnitCalculations.html
+    let size = 100; // fixed overhead for index data
+    for (const [key, value] of Object.entries(item)) {
+      size += key.length + Buffer.byteLength(value.toString());
+    }
+    if (size <= dynamoDbMaxItemSize) {
+      return true;
+    }
+    logSizeLimitError(item.namespace, item.key);
+    return false;
+  }
+
+  function logSizeLimitError(namespace, key) {
+    logger.error(`The item "${key}" in "${namespace}" was too large to store in DynamoDB and was dropped`);
+  }
+  
   return store;
 }
 

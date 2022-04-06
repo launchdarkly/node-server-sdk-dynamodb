@@ -14,7 +14,7 @@ const {
 } = require('launchdarkly-node-server-sdk/sharedtest/store_tests');
 const AWS = require('aws-sdk');
 const { promisify } = require('util');
-const { asyncSleep } = require('launchdarkly-js-test-helpers');
+const { asyncSleep, promisifySingle } = require('launchdarkly-js-test-helpers');
 
 // Runs the standard test suites provided by the SDK's store_tests module, plus some additional
 // tests specific to this package.
@@ -88,57 +88,144 @@ describe('DynamoDBFeatureStore', function() {
       store = DynamoDBFeatureStore(testTableName, { dynamoDBClient: client })({ logger });
     });
 
-    it('error from query in init', done => {
+    it('error from query in init', async () => {
       var data = { features: { flag: { key: 'flag', version: 1 } } };
       client.query = (params, cb) => cb(err);
-      store.init(data, function() {
-        expect(logger.error).toHaveBeenCalled();
-        done();
-      });
+      await promisifySingle(store.init)(data);
+      expect(logger.error).toHaveBeenCalled();
     });
 
-    it('error from batchWrite in init', done => {
+    it('error from batchWrite in init', async () => {
       var data = { features: { flag: { key: 'flag', version: 1 } } };
       client.query = (params, cb) => cb(null, { Items: [] });
       client.batchWrite = (params, cb) => cb(err);
-      store.init(data, function() {
-        expect(logger.error).toHaveBeenCalled();
-        done();
-      });
+      await promisifySingle(store.init)(data);
+      expect(logger.error).toHaveBeenCalled();
     });
 
-    it('error from get', done => {
+    it('error from get', async () => {
       client.get = (params, cb) => cb(err);
-      store.get(dataKind.features, 'flag', function(result) {
-        expect(result).toBe(null);
-        expect(logger.error).toHaveBeenCalled();
-        done();
-      });
+      const result = await promisifySingle(store.get)(dataKind.features, 'flag');
+      expect(result).toBe(null);
+      expect(logger.error).toHaveBeenCalled();
     });
 
-    it('error from get all', done => {
+    it('error from get all', async () => {
       client.query = (params, cb) => cb(err);
-      store.all(dataKind.features, function(result) {
-        expect(result).toBe(null);
-        expect(logger.error).toHaveBeenCalled();
-        done();
-      });
+      const result = await promisifySingle(store.all)(dataKind.features);
+      expect(result).toBe(null);
+      expect(logger.error).toHaveBeenCalled();
     });
 
-    it('error from upsert', done => {
+    it('error from upsert', async () => {
       client.put = (params, cb) => cb(err);
-      store.upsert(dataKind.features, { key: 'flag', version: 1 }, function() {
-        expect(logger.error).toHaveBeenCalled();
-        done();
+      await promisifySingle(store.upsert)(dataKind.features, { key: 'flag', version: 1 });
+      expect(logger.error).toHaveBeenCalled();
+    });
+
+    it('error from initialized', async () => {
+      client.get = (params, cb) => cb(err);
+      const result = await promisifySingle(store.initialized)();
+      expect(result).toBe(false);
+      expect(logger.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('items over the data size limit', () => {
+    let logger;
+    let store;
+
+    beforeEach(() => {
+      logger = stubLogger();
+      store = DynamoDBFeatureStore(testTableName, { cacheTTL: 0 })({ logger });
+      // Here we're disabling caching because we want to see if the data is really put into the database. If
+      // there's a cache, data could be stored in and retrieved from the cache even though the data was too
+      // big to go into the database.
+    });
+
+    function makeGoodData() {
+      return {
+        features: {
+          flag1: { key: 'flag1', version: 1 },
+          flag2: { key: 'flag2', version: 1 }
+        },
+        segments: {
+          segment1: { key: 'segment1', version: 1 },
+          segment2: { key: 'segment2', version: 1 },
+        }
+      };
+    }
+
+    async function getAllData() {
+      const flags = await promisifySingle(store.all)(dataKind.features);
+      const segments = await promisifySingle(store.all)(dataKind.segments);
+      return { features: flags, segments: segments };
+    }
+
+    function makeBigKeyList() {
+      const ret = [];
+      for (let i = 0; i < 40000; i++) {
+        ret.push('key' + i);
+      }
+      expect(JSON.stringify(ret).length).toBeGreaterThan(400 * 1024);
+      return ret;
+    }
+
+    function makeTooBigFlag() {
+      return { key: 'flag1a', version: 1, targets: [{ variation: 0, values: makeBigKeyList() }] };
+    }
+
+    function makeTooBigSegment() {
+      return { key: 'segment1a', version: 1, included: makeBigKeyList() };
+    }
+    
+    function expectSizeLimitErrorLog(logger) {
+      expect(logger.error.mock.calls.length).toBe(1);
+      expect(logger.error.mock.calls[0][0]).toContain('was too large to store in DynamoDB and was dropped');
+    }
+
+    describe('skips and logs too-large item in init', () => {
+      async function testInit(kind, item) {
+        await clearData();
+
+        const data = makeGoodData();
+        data[kind.namespace][item.key] = item;  
+        await promisifySingle(store.init)(data);
+
+        expectSizeLimitErrorLog(logger);
+        expect(await getAllData()).toEqual(makeGoodData());
+      }
+
+      it('flag', async () => {
+        await testInit(dataKind.features, makeTooBigFlag());
+      });
+      
+      it('segment', async () => {
+        await testInit(dataKind.segments, makeTooBigSegment());
       });
     });
 
-    it('error from initialized', done => {
-      client.get = (params, cb) => cb(err);
-      store.initialized(function(result) {
-        expect(result).toBe(false);
-        expect(logger.error).toHaveBeenCalled();
-        done();
+    describe('skips and logs too-large item in upsert', () => {
+      async function testUpsert(kind, item) {
+        await clearData();
+
+        const data = makeGoodData();
+        await promisifySingle(store.init)(data);
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(await getAllData()).toEqual(makeGoodData());
+
+        await promisify(store.upsert)(kind, item);
+
+        expectSizeLimitErrorLog(logger);
+        expect(await getAllData()).toEqual(makeGoodData());
+      }
+
+      it('flag', async () => {
+        await testUpsert(dataKind.features, makeTooBigFlag());
+      });
+      
+      it('segment', async () => {
+        await testUpsert(dataKind.segments, makeTooBigSegment());
       });
     });
   });
