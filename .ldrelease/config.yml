@@ -6,7 +6,8 @@ publications:
 
 branches:
   - name: master
-    description: 3.x
+    description: 4.x
+  - name: 3.x
   - name: 2.x
   - name: 1.x
 
