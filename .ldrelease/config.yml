@@ -5,7 +5,7 @@ publications:
     description: npm
 
 branches:
-  - name: master
+  - name: main
     description: 4.x
   - name: 3.x
   - name: 2.x
