@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly Node.js SDK DynamoDB integration will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [4.1.0] - 2022-12-07
+### Added:
+- Added support for `launchdarkly-node-server-sdk` `7.0.0` and greater.
+
 ## [4.0.1] - 2022-04-06
 ### Fixed:
 - If the SDK attempts to store a feature flag or segment whose total data size is over the 400KB limit for DynamoDB items, this integration will now log (at `error` level) a message like `The item "my-flag-key" in "features" was too large to store in DynamoDB and was dropped` but will still process all other data updates. Previously, it would cause the SDK to enter an error state in which the oversized item would be pointlessly retried and other updates might be lost. ([#25](https://github.com/launchdarkly/node-server-sdk-dynamodb/issues/25))
