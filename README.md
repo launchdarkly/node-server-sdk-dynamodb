@@ -1,5 +1,11 @@
 # LaunchDarkly Server-Side SDK for Node.js - DynamoDB integration
 
+# :warning: Important note
+
+This integration in this does not work with version 8.0+ of the Node.js Server-Side SDK. Future development of this integration will be done here [node-server-sdk-dynamodb](https://github.com/launchdarkly/js-core/tree/main/packages/store/node-server-sdk-dynamodb). Please note the package has also been renamed from `launchdarkly-node-server-sdk-dynamodb` to `@launchdarkly/node-server-sdk-dynamodb`.
+
+As mentioned in the [node server sdk changelog](https://github.com/launchdarkly/node-server-sdk/blob/main/CHANGELOG.md), the `launchdarkly-node-server-sdk` project has been renamed to `@launchdarkly/node-server-sdk`. All future releases will be made from the [new repository](https://github.com/launchdarkly/js-core/tree/main/packages/sdk/server-node). Please consider upgrading and filing potential requests in that repository's [issue tracker](https://github.com/launchdarkly/js-core/issues?q=is%3Aissue+is%3Aopen+label%3A%22package%3A+sdk%2Fserver-node%22+sort%3Aupdated-desc).
+
 [![CircleCI](https://circleci.com/gh/launchdarkly/node-server-sdk-dynamodb.svg?style=svg)](https://circleci.com/gh/launchdarkly/node-server-sdk-dynamodb)
 
 This library provides a DynamoDB-backed persistence mechanism (feature store) for the [LaunchDarkly Node.js SDK](https://github.com/launchdarkly/node-server-sdk), replacing the default in-memory feature store. It uses the AWS SDK for Node.js.
